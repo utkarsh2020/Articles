@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Development in C# — The .NET 10 Era | LinkedIn Article</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f2ef;
+      color: #1d2226;
+      line-height: 1.75;
+    }
+
+    .page-wrapper {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    /* ── Hero Banner ── */
+    .hero {
+      background: linear-gradient(135deg, #0a2a5e 0%, #0d47a1 45%, #512da8 100%);
+      padding: 56px 48px 44px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-sub {
+      font-size: 16px;
+      opacity: 0.85;
+      max-width: 560px;
+      position: relative;
+      color: #fff;
+      z-index: 1;
+    }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 28px;
+      font-size: 13px;
+      opacity: 0.75;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Body ── */
+    .body { padding: 48px 48px 56px; }
+
+    /* ── Section Headings ── */
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0a2a5e;
+      margin: 48px 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #e3eaf6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title .emoji { font-size: 24px; }
+    .section-title:first-of-type { margin-top: 0; }
+
+    p { font-size: 15.5px; color: #2d3748; margin-bottom: 16px; }
+
+    /* ── Feature Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 28px;
+    }
+    @media(max-width:600px){ .card-grid { grid-template-columns: 1fr; } }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 18px;
+    }
+    .card-icon { font-size: 26px; margin-bottom: 8px; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0a2a5e; margin-bottom: 6px; }
+    .card-desc { font-size: 13.5px; color: #4a5568; line-height: 1.6; margin: 0; }
+
+    /* ── Code Blocks ── */
+    .code-wrap {
+      background: #0d1117;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0 28px;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #161b22;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #8b949e;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .code-header .lang {
+      background: #21262d;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #79c0ff;
+      font-weight: 600;
+    }
+    pre {
+      padding: 20px 20px;
+      overflow-x: auto;
+      margin: 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e6edf3;
+    }
+    .kw { color: #ff7b72; }       /* keywords */
+    .type { color: #79c0ff; }      /* types */
+    .str { color: #a5d6ff; }       /* strings */
+    .cmt { color: #8b949e; font-style: italic; } /* comments */
+    .attr { color: #d2a8ff; }      /* attributes */
+    .num { color: #f2cc60; }       /* numbers/literals */
+    .meth { color: #d2a8ff; }      /* methods */
+    .prop { color: #79c0ff; }      /* props */
+
+    /* ── Callout Box ── */
+    .callout {
+      border-left: 4px solid #0d47a1;
+      background: #eef2fb;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+    .callout p { margin: 0; font-size: 14.5px; color: #1a365d; }
+    .callout strong { color: #0a2a5e; }
+
+    /* ── Comparison Table ── */
+    .table-wrap { overflow-x: auto; margin: 20px 0 28px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: #0d47a1; color: #fff; }
+    thead th { padding: 12px 16px; text-align: left; font-weight: 700; }
+    tbody tr:nth-child(even) { background: #f7f9fc; }
+    tbody tr:nth-child(odd) { background: #fff; }
+    td { padding: 11px 16px; color: #2d3748; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    td:first-child { font-weight: 600; color: #1a365d; }
+    .good { color: #2f855a; font-weight: 600; }
+    .neutral { color: #744210; font-weight: 600; }
+
+    /* ── Links ── */
+    a { color: #0d47a1; text-decoration: none; border-bottom: 1px solid #b3c7e8; transition: color 0.15s; }
+    a:hover { color: #512da8; border-color: #9c6fda; }
+
+    /* ── CTA / Outro ── */
+    .cta {
+      background: linear-gradient(135deg, #0a2a5e, #512da8);
+      border-radius: 12px;
+      padding: 32px 30px;
+      color: #fff;
+      margin-top: 48px;
+      text-align: center;
+    }
+    .cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .cta p { font-size: 14.5px; opacity: 0.88; margin: 0; color: #fff;}
+
+    /* ── Tag Pills ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+    .tag {
+      background: #e8eef8;
+      color: #0a2a5e;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 14px;
+    }
+
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 36px 0; }
+
+    .highlight { background: #fffbea; border-radius: 4px; padding: 1px 4px; font-weight: 600; color: #744210; }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">LinkedIn Article · AI &amp; .NET</div>
+    <h1>The AI Era of C# Is Here — And You Don't Need Python to Join It</h1>
+    <p class="hero-sub">How .NET 10 &amp; C# 14 are turning C# into a first-class citizen for building intelligent, production-grade AI systems — written in the language you already love.</p>
+    <div class="hero-meta">
+      <span>📅 March 2026</span>
+      <span>⏱ 8 min read</span>
+      <span>🏷 .NET 10 · C# 14 · AI · LLM</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p>I've spent the better part of two decades writing C#. From WinForms to ASP.NET Web API, from Entity Framework to cloud-native microservices — this language has never let me down. But for the last few years, every time the topic of AI came up, I kept hearing the same thing: <em>"Just learn Python."</em></p>
+
+    <p>I refused. And it turns out, I was right to.</p>
+
+    <p>With the release of <strong>.NET 10 (LTS)</strong> and <strong>C# 14</strong> in November 2025, Microsoft hasn't just given us another incremental update — it has fundamentally repositioned the entire .NET platform as a first-class AI development environment. Today, I'm going to walk you through the most exciting capabilities across C# 14, .NET 10's AI stack, and why you — as a C# developer — can build cutting-edge LLM-powered applications without ever touching a single line of Python.</p>
+
+    <!-- SECTION 1 -->
+    <div class="section-title"><span class="emoji">⚡</span> .NET 10 — The Most Performant Release Yet</div>
+
+    <p>Let's start with the raw numbers. <strong>.NET 10 delivers 49% faster average response times compared to .NET 8</strong>, driven by a revamped JIT compiler that now takes full advantage of AVX-512, AVX10.2, and ARM SVE/SVE2 vector extensions. JSON serialization — critical for AI pipelines handling prompt/response payloads — is now 20–40% faster. You get these gains for free, with zero code changes.</p>
+
+    <p>As an LTS release supported through November 2028, this is the version to bet your enterprise AI projects on.</p>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10/overview" target="_blank">What's new in .NET 10 — Microsoft Learn</a></p>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section-title"><span class="emoji">🧬</span> C# 14 — Less Boilerplate, More Expression</div>
+
+    <p>C# 14 ships alongside .NET 10 and delivers a set of language features that will meaningfully improve your day-to-day productivity. Here are the highlights that matter most for building AI-centric applications.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <div class="card-title">Extension Members (Headline Feature)</div>
+        <p class="card-desc">Define extension properties, operators, and static members in a single unified block — no more workarounds. Attach AI-enrichment behavior directly to your domain types.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <div class="card-title">Field-Backed Properties</div>
+        <p class="card-desc">Use the <code>field</code> keyword to access auto-property backing fields directly — cleaner property logic without a separate private variable.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">Null-Conditional Assignment (?.=)</div>
+        <p class="card-desc">Assign only when not null with <code>target ?.= value</code>. Extremely useful in defensive AI pipeline coding where configuration may be partial.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏗</div>
+        <div class="card-title">Partial Constructors &amp; Events</div>
+        <p class="card-desc">Complement partial methods and properties from C# 13 — great for source-generated AI agent scaffolding and plugin patterns.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <div class="card-title">Ref/In/Out Lambda Parameters</div>
+        <p class="card-desc">Lambdas can now carry ref, in, and out modifiers without specifying full types — enabling high-performance, allocation-free pipeline callbacks.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Native AOT + Single-File Apps</div>
+        <p class="card-desc">Minimal APIs compiled with Native AOT now weigh under 5 MB. Run a single .cs file with <code>dotnet run</code> — no project file needed. Perfect for AI microservices.</p>
+      </div>
+    </div>
+
+    <p>Here's a taste of C# 14's new extension members — imagine enriching a <code>ChatMessage</code> type with AI-specific behavior without modifying the original class:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>Extension Members — C# 14</span>
+        <span class="lang">C#</span>
+      </div>
+      <pre><code><span class="cmt">// C# 14: Unified extension block — adds properties &amp; operators to any type</span>
+<span class="kw">public static class</span> <span class="type">ChatMessageExtensions</span>
+{
+    <span class="kw">extension</span>(<span class="type">ChatMessage</span>)
+    {
+        <span class="cmt">// Extension property — reads like a native property</span>
+        <span class="kw">public bool</span> <span class="prop">IsSystemPrompt</span>
+            =&gt; Role == <span class="type">ChatRole</span>.System;
+
+        <span class="cmt">// Extension property to estimate token cost</span>
+        <span class="kw">public int</span> <span class="prop">EstimatedTokens</span>
+            =&gt; Content?.Length / <span class="num">4</span> ?? <span class="num">0</span>;
+
+        <span class="cmt">// Static extension factory</span>
+        <span class="kw">public static</span> <span class="type">ChatMessage</span> <span class="meth">CreateSystemPrompt</span>(<span class="kw">string</span> instructions)
+            =&gt; <span class="kw">new</span>(<span class="type">ChatRole</span>.System, instructions);
+    }
+}
+
+<span class="cmt">// C# 14: field keyword — no more manual backing fields</span>
+<span class="kw">public class</span> <span class="type">AiAgentOptions</span>
+{
+    <span class="kw">public string</span> <span class="prop">ModelId</span>
+    {
+        <span class="kw">get</span> =&gt; field ??= <span class="str">"gpt-4o"</span>;
+        <span class="kw">set</span> =&gt; field = value ?? <span class="kw">throw new</span> <span class="type">ArgumentNullException</span>(<span class="kw">nameof</span>(value));
+    }
+
+    <span class="cmt">// C# 14: null-conditional assignment</span>
+    <span class="kw">public void</span> <span class="meth">ApplyDefaults</span>(<span class="type">AiAgentOptions</span>? overrides)
+        =&gt; ModelId ?.= overrides?.ModelId;
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-14" target="_blank">What's new in C# 14 — Microsoft Learn</a></p>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section-title"><span class="emoji">🤖</span> The Microsoft Agent Framework — AI Orchestration, Built In</div>
+
+    <p>The centerpiece of .NET 10's AI story is the <strong>Microsoft Agent Framework</strong> — a unified toolkit that brings together <strong>Semantic Kernel</strong> and <strong>AutoGen</strong> into a single, cohesive developer experience. This isn't a third-party add-on. It ships <em>with</em> .NET 10.</p>
+
+    <p>The framework lets you build multi-agent AI systems — with sequential, concurrent, handoff, and group-chat orchestration patterns — using the same dependency injection, middleware, and hosting model you already know from ASP.NET Core. You can host agents as HTTP endpoints, inspect them through a built-in Dev UI, and wire them to MCP (Model Context Protocol) servers for external tool integration.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>Microsoft Agent Framework — Multi-Agent Orchestration</span>
+        <span class="lang">C#</span>
+      </div>
+      <pre><code><span class="kw">var</span> builder = <span class="type">WebApplication</span>.<span class="meth">CreateBuilder</span>(args);
+
+<span class="cmt">// Register AI services via Microsoft.Extensions.AI</span>
+builder.Services.<span class="meth">AddChatClient</span>(
+    <span class="kw">new</span> <span class="type">AzureOpenAIClient</span>(
+        <span class="kw">new</span> <span class="type">Uri</span>(builder.Configuration[<span class="str">"AzureOpenAI:Endpoint"</span>]!),
+        <span class="kw">new</span> <span class="type">DefaultAzureCredential</span>()
+    ).<span class="meth">AsChatClient</span>(<span class="str">"gpt-4o"</span>)
+).<span class="meth">UseLogging</span>().<span class="meth">UseOpenTelemetry</span>();
+
+<span class="cmt">// Register Agent Framework with Semantic Kernel orchestration</span>
+builder.Services
+    .<span class="meth">AddAgentFramework</span>()
+    .<span class="meth">AddAgent</span>&lt;<span class="type">TriageAgent</span>&gt;(<span class="str">"triage"</span>)
+    .<span class="meth">AddAgent</span>&lt;<span class="type">BillingAgent</span>&gt;(<span class="str">"billing"</span>)
+    .<span class="meth">AddAgent</span>&lt;<span class="type">RefundAgent</span>&gt;(<span class="str">"refund"</span>)
+    .<span class="meth">WithHandoffOrchestration</span>();   <span class="cmt">// Triage routes to specialist agents</span>
+
+<span class="kw">var</span> app = builder.<span class="meth">Build</span>();
+app.<span class="meth">MapAgentEndpoints</span>();         <span class="cmt">// Expose agents as HTTP endpoints</span>
+app.<span class="meth">Run</span>();
+
+<span class="cmt">// An agent is just a class — full DI support</span>
+<span class="attr">[AgentInstructions("You handle billing queries including charges and payment methods.")]</span>
+<span class="kw">public class</span> <span class="type">BillingAgent</span>(<span class="type">IChatClient</span> chatClient, <span class="type">IBillingRepository</span> repo)
+    : <span class="type">ChatCompletionAgent</span>(chatClient)
+{
+    <span class="attr">[KernelFunction, Description("Retrieves outstanding invoice for a customer")]</span>
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">Invoice</span>&gt; <span class="meth">GetInvoiceAsync</span>(<span class="kw">string</span> customerId)
+        =&gt; <span class="kw">await</span> repo.<span class="meth">GetLatestAsync</span>(customerId);
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/dotnet/ai/microsoft-agent-framework" target="_blank">Microsoft Agent Framework — Microsoft Learn</a> &nbsp;|&nbsp; <a href="https://learn.microsoft.com/en-us/semantic-kernel/overview/" target="_blank">Semantic Kernel Overview</a></p>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section-title"><span class="emoji">🔌</span> Microsoft.Extensions.AI — The IChatClient Abstraction</div>
+
+    <p><strong>Microsoft.Extensions.AI</strong> is the glue that holds your AI stack together. It provides a unified <code>IChatClient</code> interface that works with Azure OpenAI, OpenAI, Anthropic Claude, Ollama (local models), and any compatible provider — without changing a line of business logic. Swap your model provider as easily as swapping a database.</p>
+
+    <p>It plugs natively into the <code>Microsoft.Extensions.*</code> ecosystem — full DI, logging, and OpenTelemetry out of the box. <em>This is the standardization story that Python's fragmented ecosystem still can't match.</em></p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>Microsoft.Extensions.AI — Provider-Agnostic Chat</span>
+        <span class="lang">C#</span>
+      </div>
+      <pre><code><span class="cmt">// Register once — swap providers without touching business logic</span>
+builder.Services.<span class="meth">AddChatClient</span>(services =&gt;
+    <span class="cmt">// Azure OpenAI in production</span>
+    <span class="kw">new</span> <span class="type">AzureOpenAIClient</span>(endpoint, credential).<span class="meth">AsChatClient</span>(<span class="str">"gpt-4o"</span>)
+)
+.<span class="meth">UseLogging</span>()                       <span class="cmt">// Structured logging via ILogger</span>
+.<span class="meth">UseOpenTelemetry</span>()                  <span class="cmt">// Distributed tracing</span>
+.<span class="meth">UseFunctionInvocation</span>();            <span class="cmt">// Auto tool-calling loop
+
+</span><span class="cmt">// In your service — zero provider dependency</span>
+<span class="kw">public class</span> <span class="type">DocumentSummaryService</span>(<span class="type">IChatClient</span> chatClient)
+{
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="kw">string</span>&gt; <span class="meth">SummarizeAsync</span>(<span class="kw">string</span> document)
+    {
+        <span class="kw">var</span> response = <span class="kw">await</span> chatClient.<span class="meth">CompleteAsync</span>(
+        [
+            <span class="kw">new</span>(<span class="type">ChatRole</span>.System, <span class="str">"You are a concise technical writer."</span>),
+            <span class="kw">new</span>(<span class="type">ChatRole</span>.User,   <span class="str">$"Summarize this document:\n\n{document}"</span>)
+        ]);
+        <span class="kw">return</span> response.Message.Text ?? <span class="kw">string</span>.Empty;
+    }
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/dotnet/ai/dotnet-ai-overview" target="_blank">AI in .NET — Microsoft Learn</a> &nbsp;|&nbsp; <a href="https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.ai" target="_blank">Microsoft.Extensions.AI API Reference</a></p>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section-title"><span class="emoji">🧠</span> RAG with EF Core 10 Vector Search</div>
+
+    <p>Retrieval-Augmented Generation (RAG) is the pattern behind most production AI features — and EF Core 10 now ships with native <strong>vector search support for Azure SQL and SQL Server</strong>. You can store embeddings, run similarity queries, and build RAG pipelines entirely within your existing EF Core data model. No separate vector database required to get started.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>RAG Pipeline — EF Core 10 + Microsoft.Extensions.AI Embeddings</span>
+        <span class="lang">C#</span>
+      </div>
+      <pre><code><span class="cmt">// Store document embeddings in SQL Server via EF Core 10</span>
+<span class="kw">public class</span> <span class="type">KnowledgeEntry</span>
+{
+    <span class="kw">public int</span>    <span class="prop">Id</span>      { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> <span class="prop">Content</span> { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">string</span>.Empty;
+
+    <span class="attr">[VectorDimension(1536)]</span>
+    <span class="kw">public</span> <span class="type">Vector</span> <span class="prop">Embedding</span> { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="type">Vector</span>.Empty;
+}
+
+<span class="kw">public class</span> <span class="type">RagService</span>(<span class="type">KnowledgeDbContext</span> db, <span class="type">IEmbeddingGenerator</span>&lt;<span class="kw">string</span>, <span class="type">Embedding</span>&lt;<span class="kw">float</span>&gt;&gt; embedder, <span class="type">IChatClient</span> chatClient)
+{
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="kw">string</span>&gt; <span class="meth">AnswerAsync</span>(<span class="kw">string</span> question)
+    {
+        <span class="cmt">// 1. Embed the question</span>
+        <span class="kw">var</span> queryVector = <span class="kw">await</span> embedder.<span class="meth">GenerateEmbeddingVectorAsync</span>(question);
+
+        <span class="cmt">// 2. Retrieve semantically similar chunks via EF Core 10 vector search</span>
+        <span class="kw">var</span> context = <span class="kw">await</span> db.Knowledge
+            .<span class="meth">OrderBy</span>(e =&gt; e.Embedding.<span class="meth">VectorDistance</span>(queryVector))
+            .<span class="meth">Take</span>(<span class="num">5</span>)
+            .<span class="meth">Select</span>(e =&gt; e.Content)
+            .<span class="meth">ToListAsync</span>();
+
+        <span class="cmt">// 3. Generate grounded answer</span>
+        <span class="kw">return</span> (<span class="kw">await</span> chatClient.<span class="meth">CompleteAsync</span>(
+        [
+            <span class="kw">new</span>(<span class="type">ChatRole</span>.System, <span class="str">$"Answer using only this context:\n{string.Join("\n", context)}"</span>),
+            <span class="kw">new</span>(<span class="type">ChatRole</span>.User,   question)
+        ])).Message.Text ?? <span class="str">"No answer found."</span>;
+    }
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-10.0/whatsnew" target="_blank">What's new in EF Core 10 — Microsoft Learn</a></p>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section-title"><span class="emoji">🔗</span> First-Class MCP Support &amp; Post-Quantum Security</div>
+
+    <p><strong>Model Context Protocol (MCP)</strong> is the emerging standard for connecting AI agents to external tools and data sources — and .NET 10 ships with first-class MCP support. You can stand up an MCP server or connect an MCP client from your .NET app in just a few lines, turning any C# service into a tool that LLMs can invoke.</p>
+
+    <p>On the security front, .NET 10 expands post-quantum cryptography with <strong>ML-DSA, ML-KEM, HashML-DSA</strong>, and Composite ML-DSA support. As you build AI systems that handle sensitive enterprise data, this is the foundation to build on.</p>
+
+    <div class="callout">
+      <p>📎 Official docs: <a href="https://learn.microsoft.com/en-us/dotnet/ai/model-context-protocol" target="_blank">Model Context Protocol in .NET — Microsoft Learn</a> &nbsp;|&nbsp; <a href="https://learn.microsoft.com/en-us/dotnet/standard/security/cryptography-model" target="_blank">Cryptography in .NET</a></p>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- SECTION 7 — THE BIG ONE -->
+    <div class="section-title"><span class="emoji">🐍</span> C# vs Python for AI — You Don't Need to Switch</div>
+
+    <p>Let me address the elephant in the room. Python has a massive head start in AI: NumPy, PyTorch, transformers, LangChain, and the Jupyter ecosystem all have years of community investment. I won't pretend otherwise. But here's what I've lived through first-hand — and what the data is starting to show.</p>
+
+    <p>For enterprise developers building production AI systems, <strong>C# is not just a viable alternative to Python — in many scenarios, it's the superior choice.</strong></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>C# / .NET 10</th>
+            <th>Python</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🏗 Type Safety &amp; Tooling</td>
+            <td class="good">Strong static typing, Roslyn analyzers, IntelliSense. Errors caught at compile time.</td>
+            <td>Dynamic typing; runtime errors in prompts &amp; JSON parsing are common. Type hints help but aren't enforced.</td>
+          </tr>
+          <tr>
+            <td>⚡ Performance</td>
+            <td class="good">.NET 10 is 49% faster than .NET 8. Native AOT enables sub-5ms cold starts. AVX-512 auto-vectorization.</td>
+            <td>Interpreted; GIL limits true parallelism. PyPy &amp; async help but C# wins in throughput at scale.</td>
+          </tr>
+          <tr>
+            <td>🔧 Dependency Management</td>
+            <td class="good">NuGet + SDK versioning is reproducible and enterprise-friendly. Works seamlessly in CI/CD.</td>
+            <td>pip, conda, venv, poetry — dependency hell is real. Virtual env conflicts are a daily pain.</td>
+          </tr>
+          <tr>
+            <td>🏢 Enterprise Integration</td>
+            <td class="good">Native DI, EF Core, SignalR, gRPC, Azure SDKs — integrate AI into existing .NET solutions without rewrites.</td>
+            <td>Django/FastAPI are capable, but integrating with .NET enterprise systems typically requires additional glue code.</td>
+          </tr>
+          <tr>
+            <td>🤝 LLM SDK Quality</td>
+            <td class="good">Microsoft.Extensions.AI, Semantic Kernel, Azure OpenAI SDK — first-party, production-grade, LTS-backed.</td>
+            <td class="good">LangChain, OpenAI SDK, Hugging Face — mature, with the largest open-source community.</td>
+          </tr>
+          <tr>
+            <td>🔬 ML Research &amp; Prototyping</td>
+            <td class="neutral">ONNX Runtime, ML.NET, TorchSharp available — but smaller research community &amp; fewer notebooks.</td>
+            <td class="good">Unmatched. PyTorch, JAX, Jupyter, Hugging Face models, fast-changing research landscape.</td>
+          </tr>
+          <tr>
+            <td>🌐 Local Model Inference</td>
+            <td class="good">LLamaSharp, OllamaSharp, ONNX Runtime — run local models fully in C# without a Python sidecar.</td>
+            <td class="good">Ollama, llama.cpp Python bindings — mature, with more models available out-of-the-box.</td>
+          </tr>
+          <tr>
+            <td>🔒 Security &amp; Compliance</td>
+            <td class="good">Post-quantum crypto, TLS 1.3, .NET's memory safety model. No sandboxing surprises.</td>
+            <td>Pickle deserialization vulnerabilities, dependency supply-chain risks are real concerns in enterprise settings.</td>
+          </tr>
+          <tr>
+            <td>📦 Deployment</td>
+            <td class="good">Single-binary Native AOT, Docker, AKS — minimal footprint, fast cold start.</td>
+            <td>Requires Python runtime, venv, or container layering — larger images, slower cold starts.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The verdict: if you're <strong>training custom models or doing academic research</strong>, Python is still the right tool. But if you're <strong>building production AI features</strong> — RAG pipelines, agent systems, LLM-powered APIs, enterprise chatbots — C# with .NET 10 is now equally capable, and in many dimensions, more suitable for the job.</p>
+
+    <p>The key tools a C# developer needs to work with LLMs today:</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">Semantic Kernel</div>
+        <p class="card-desc">Orchestration SDK for prompt templates, plugins, memory, and multi-agent flows. Works with OpenAI, Azure OpenAI, Anthropic, Hugging Face, and local models. <a href="https://learn.microsoft.com/en-us/semantic-kernel/overview/" target="_blank">Official docs →</a></p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <div class="card-title">Microsoft.Extensions.AI</div>
+        <p class="card-desc">Unified IChatClient abstraction — swap providers without changing business logic. Built-in DI, logging, OpenTelemetry. <a href="https://learn.microsoft.com/en-us/dotnet/ai/dotnet-ai-overview" target="_blank">Official docs →</a></p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🦙</div>
+        <div class="card-title">LLamaSharp / OllamaSharp</div>
+        <p class="card-desc">Run Llama, Mistral, Phi, Gemma and other open models fully locally in C# — no Python sidecar, no Ollama Python SDK required.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">Microsoft Agent Framework</div>
+        <p class="card-desc">Build multi-agent orchestration systems using familiar ASP.NET Core hosting patterns. Ships with .NET 10. <a href="https://learn.microsoft.com/en-us/dotnet/ai/microsoft-agent-framework" target="_blank">Official docs →</a></p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- CLOSING -->
+    <div class="section-title"><span class="emoji">🚀</span> Where to Start</div>
+
+    <p>If you're a C# developer who's been told to learn Python for AI, my message is simple: <strong>don't let the narrative stop you</strong>. The .NET AI ecosystem in 2026 is production-ready, Microsoft-backed, and accelerating fast. The tooling is excellent, the performance is world-class, and the language you've spent years mastering is now a first-class citizen in the AI era.</p>
+
+    <p>Start here:</p>
+
+    <div class="callout">
+      <p>
+        🔗 <a href="https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10/overview" target="_blank">What's new in .NET 10</a><br/>
+        🔗 <a href="https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-14" target="_blank">What's new in C# 14</a><br/>
+        🔗 <a href="https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide" target="_blank">Semantic Kernel Quick Start</a><br/>
+        🔗 <a href="https://learn.microsoft.com/en-us/dotnet/ai/dotnet-ai-overview" target="_blank">AI in .NET — Overview</a><br/>
+        🔗 <a href="https://learn.microsoft.com/en-us/dotnet/ai/model-context-protocol" target="_blank">Model Context Protocol (MCP) in .NET</a><br/>
+        🔗 <a href="https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-10.0/whatsnew" target="_blank">What's new in EF Core 10</a>
+      </p>
+    </div>
+
+    <p>The AI era of C# is here. Build something intelligent.</p>
+
+    <div class="cta">
+      <h3>Found this useful? Share it with your .NET community. 🙌</h3>
+      <p>Drop a comment with the AI feature you're most excited to try in .NET 10 — I'd love to hear what you're building.</p>
+    </div>
+
+    <div class="tags">
+      <span class="tag">#dotnet</span>
+      <span class="tag">#csharp</span>
+      <span class="tag">#artificialintelligence</span>
+      <span class="tag">#llm</span>
+      <span class="tag">#semantickernel</span>
+      <span class="tag">#microsoftazure</span>
+      <span class="tag">#softwaredevelopment</span>
+      <span class="tag">#net10</span>
+      <span class="tag">#csharp14</span>
+      <span class="tag">#agentai</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
