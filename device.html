@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Detector</title>
+    <style>
+        :root {
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --text: #2d3436;
+            --accent: #0984e3;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 5px solid var(--accent);
+        }
+        h1 { margin-bottom: 1.5rem; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
+        .data-row {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        .label { font-weight: 600; color: #636e72; }
+        .value { color: var(--accent); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Device Information</h1>
+        <div class="data-row">
+            <span class="label">OS:</span> 
+            <span id="os" class="value">Detecting...</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Browser:</span> 
+            <span id="browser" class="value">Detecting...</span>
+        </div>
+    </div>
+
+    <script>
+        (function detectSystem() {
+            const ua = navigator.userAgent;
+            let os = "Unknown OS";
+            let browser = "Unknown Browser";
+
+            // OS Detection
+            const osLogic = [
+                { name: 'Windows', rule: /Win/ },
+                { name: 'MacOS', rule: /Mac/ },
+                { name: 'Android', rule: /Android/ },
+                { name: 'iOS', rule: /(iPhone|iPad|iPod)/ },
+                { name: 'Linux', rule: /Linux/ }
+            ];
+
+            const foundOs = osLogic.find(item => item.rule.test(ua));
+            if (foundOs) os = foundOs.name;
+
+            // Browser Detection
+            if (ua.includes("Firefox")) browser = "Mozilla Firefox";
+            else if (ua.includes("SamsungBrowser")) browser = "Samsung Internet";
+            else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+            else if (ua.includes("Edge") || ua.includes("Edg")) browser = "Microsoft Edge";
+            else if (ua.includes("Chrome")) browser = "Google Chrome";
+            else if (ua.includes("Safari")) browser = "Apple Safari";
+            else if (ua.includes("Trident")) browser = "Internet Explorer";
+
+            document.getElementById('os').textContent = os;
+            document.getElementById('browser').textContent = browser;
+        })();
+    </script>
+</body>
+</html>
