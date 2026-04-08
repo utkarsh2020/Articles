@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OpenWolf — Stop Burning Tokens on Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f1eb;
+    --accent: #c84b2f;
+    --accent2: #2563c8;
+    --muted: #6b6560;
+    --rule: #d6d0c8;
+    --code-bg: #1a1917;
+    --code-text: #e8dfc8;
+    --highlight: #fff3b0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    font-size: 17px;
+  }
+
+  /* ─── MASTHEAD ─── */
+  .masthead {
+    background: var(--ink);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.03) 60px,
+      rgba(255,255,255,0.03) 61px
+    );
+  }
+  .masthead-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: inline-block;
+    border: 1px solid var(--accent);
+    padding: 0.2rem 0.75rem;
+    border-radius: 2px;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    max-width: 780px;
+    margin: 0 auto 1.5rem;
+  }
+  .masthead h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .masthead-sub {
+    color: #a09a90;
+    font-size: 1rem;
+    font-weight: 300;
+    max-width: 560px;
+    margin: 0 auto 2rem;
+  }
+  .byline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6b6560;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .byline span { color: #fff; }
+
+  /* ─── LAYOUT ─── */
+  .wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ─── LEAD ─── */
+  .lead {
+    padding: 3.5rem 0 0;
+  }
+  .lead p {
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.8;
+    color: #2a2520;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ─── ARTICLE BODY ─── */
+  .body {
+    padding: 2rem 0 4rem;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 3rem 0 1rem;
+    line-height: 1.2;
+  }
+  h2::before {
+    content: '§';
+    color: var(--accent);
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    vertical-align: 0.1em;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin: 2rem 0 0.75rem;
+  }
+
+  p { margin-bottom: 1.25rem; }
+
+  a {
+    color: var(--accent2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ─── STATS STRIP ─── */
+  .stats {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin: 2.5rem 0;
+    overflow: hidden;
+  }
+  .stat-item {
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    border-right: 1px solid #2a2520;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7a7268;
+    display: block;
+    margin-top: 0.4rem;
+  }
+
+  /* ─── PROBLEM BOX ─── */
+  .problem-box {
+    background: #fff8f6;
+    border: 1px solid #f0d0c8;
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+  }
+  .problem-box .box-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .problem-box p { margin: 0; font-size: 0.95rem; }
+
+  /* ─── HOW IT WORKS ─── */
+  .hook-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1.5rem 0 2rem;
+  }
+  .hook-card {
+    background: #fff;
+    padding: 1.25rem 1.5rem;
+  }
+  .hook-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+  .hook-desc {
+    font-size: 0.85rem;
+    color: #4a4540;
+    line-height: 1.5;
+  }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #5a5450;
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+  }
+  .code-block code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--code-text);
+    line-height: 1.9;
+    display: block;
+  }
+  .code-block code .comment { color: #5a7a5a; }
+  .code-block code .cmd { color: #88c4a8; }
+  .code-block code .path { color: #c8a464; }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.5rem 0 2rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 1.25rem;
+    background: #fff;
+    border-bottom: 1px solid var(--rule);
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .flow-icon.user { background: #e8f0ff; }
+  .flow-icon.claude { background: #fff3e0; }
+  .flow-icon.wolf { background: #fde8e4; }
+  .flow-label { font-weight: 500; min-width: 80px; font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--muted); }
+  .flow-detail { color: #3a3530; flex: 1; }
+  .flow-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .flow-tag.saved { background: #e0f5e8; color: #2a7a40; }
+  .flow-tag.warn { background: #fff0e0; color: #a06020; }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0 2rem;
+    font-size: 0.9rem;
+  }
+  .compare thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--ink);
+    color: var(--muted);
+  }
+  .compare tbody tr { border-bottom: 1px solid var(--rule); }
+  .compare tbody tr:hover { background: #faf8f4; }
+  .compare td { padding: 0.85rem 1rem; vertical-align: top; }
+  .compare td:first-child { font-weight: 500; }
+  .compare .yes { color: #1a7a38; font-family: 'DM Mono', monospace; font-size: 0.85rem; }
+  .compare .no  { color: #c0392b; font-family: 'DM Mono', monospace; font-size: 0.85rem; }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    background: var(--highlight);
+    border-radius: 4px;
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.7;
+    border-left: 4px solid #c8a400;
+    color: #3a3000;
+  }
+  .callout strong { font-weight: 500; }
+
+  /* ─── SEPARATOR ─── */
+  .sep {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0;
+    color: var(--rule);
+  }
+  .sep::before, .sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .sep span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    background: var(--ink);
+    padding: 2.5rem;
+    text-align: center;
+    color: #6b6560;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+  .footer a { color: #a09a90; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: 1fr; }
+    .stat-item { border-right: none; border-bottom: 1px solid #2a2520; }
+    .hook-grid { grid-template-columns: 1fr; }
+    .masthead h1 { font-size: 2rem; }
+    .flow-label { display: none; }
+  }
+
+  /* ─── FADE IN ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .masthead > * { animation: fadeUp 0.6s ease both; }
+  .masthead .masthead-kicker { animation-delay: 0.1s; }
+  .masthead h1              { animation-delay: 0.25s; }
+  .masthead-sub             { animation-delay: 0.35s; }
+  .byline                   { animation-delay: 0.45s; }
+</style>
+</head>
+<body>
+
+<!-- ═══ MASTHEAD ═══ -->
+<header class="masthead">
+  <div class="masthead-kicker">Developer Tooling · Claude Code · Open Source</div>
+  <h1>Your AI Coding Agent Is <em>Reading Blind.</em><br/>Here's the Fix.</h1>
+  <p class="masthead-sub">How OpenWolf gives Claude Code a persistent memory — and cuts token usage by up to 80% on real GitHub projects.</p>
+  <div class="byline">
+    <span>📅 April 2026</span>
+    &nbsp;·&nbsp;
+    <span>⏱ 6 min read</span>
+    &nbsp;·&nbsp;
+    <span>Utkarsh Swarnkar</span>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <!-- ═══ LEAD ═══ -->
+  <div class="lead">
+    <p>
+      If you use Claude Code on a real GitHub project, you're probably burning far more tokens than you need to — and Claude has no idea it's doing it. 
+      OpenWolf is a free, open-source tool that silently fixes this, session after session, without changing a single thing about how you work.
+    </p>
+  </div>
+
+  <div class="body">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-num">65.8%</span>
+        <span class="stat-label">avg token reduction</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">71%</span>
+        <span class="stat-label">repeated reads caught</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">132+</span>
+        <span class="stat-label">sessions measured</span>
+      </div>
+    </div>
+
+    <!-- THE PROBLEM -->
+    <h2>The Hidden Problem with Claude Code on Real Codebases</h2>
+
+    <p>
+      Claude Code is a remarkably capable agentic tool. You describe a task, it digs into your codebase, reads files, writes code, and iterates. 
+      For most developers, it feels like having a senior engineer pair-programming with you.
+    </p>
+    <p>
+      But there's a structural inefficiency hiding underneath, and it's costing you tokens at scale.
+    </p>
+
+    <div class="problem-box">
+      <div class="box-title">⚠ The Core Problem</div>
+      <p>
+        Claude Code works completely blind. It has no map of your project, no memory of what it already read this session, and no way to 
+        tell the difference between a 50-token config file and a 2,000-token service module — until it opens the file and reads it fully.
+      </p>
+    </div>
+
+    <p>
+      The creator of OpenWolf tracked 132 sessions across 20 real GitHub projects. The finding was striking: <strong>71% of all file reads were 
+      files Claude had already opened earlier in the same session.</strong> On one project, a single file — <code>server.ts</code> — was read 
+      four separate times in one session. Not because it was needed four times. Simply because Claude had no awareness that it had already seen it.
+    </p>
+    <p>
+      On a large active project with the same codebase and the same prompts, bare Claude CLI consumed ~2.5 million tokens. With OpenWolf running 
+      alongside it: ~425,000 tokens. That's an 83% reduction, from the exact same work.
+    </p>
+
+    <!-- WHAT IS OPENWOLF -->
+    <div class="sep"><span>What It Is</span></div>
+
+    <h2>OpenWolf Is Not a Wrapper. It's a Second Brain.</h2>
+
+    <p>
+      OpenWolf sits invisibly between you and Claude Code. It doesn't change Claude's model, doesn't alter your prompts, and doesn't require 
+      any new commands or workflows. It installs itself as six Node.js lifecycle hook scripts that fire silently on every Claude action.
+    </p>
+
+    <p>It gives Claude three things it fundamentally lacks:</p>
+
+    <h3>1. A Project File Index (anatomy.md)</h3>
+    <p>
+      Before Claude opens any file, OpenWolf injects a one-line description and token estimate for that file into Claude's context. Claude sees 
+      <em>"this file is your Express auth middleware, ~380 tokens"</em> before deciding whether it needs the full content at all. 
+      For many lookups, the description is enough — the full read never happens. The index auto-updates after every write, so it's always 
+      accurate without manual maintenance.
+    </p>
+
+    <h3>2. A Learning Memory (cerebrum.md)</h3>
+    <p>
+      Every time you correct Claude — <em>"don't use var, use const"</em>, <em>"don't mock the database in integration tests"</em>, 
+      <em>"the auth middleware reads from cfg.talk, not cfg.tts"</em> — OpenWolf appends that to a persistent Do-Not-Repeat list. 
+      The next session, and every session after, Claude checks this file before writing. Preferences compound. Mistakes stop recurring.
+    </p>
+
+    <h3>3. A Token Ledger (session logs)</h3>
+    <p>
+      Every read, write, and decision is logged with estimated token usage. You get a real-time dashboard that shows where tokens actually go — 
+      which files are over-read, which patterns are wasteful, and how each session compares.
+    </p>
+
+    <!-- HOOKS -->
+    <h2>Under the Hood: 6 Hooks, Zero Friction</h2>
+
+    <div class="hook-grid">
+      <div class="hook-card">
+        <span class="hook-name">SessionStart → session-start.js</span>
+        <div class="hook-desc">Creates a session tracker and initialises the memory context for the current run.</div>
+      </div>
+      <div class="hook-card">
+        <span class="hook-name">PreToolUse → pre-read.js</span>
+        <div class="hook-desc">Warns Claude on repeated file reads and injects anatomy info before any file is opened.</div>
+      </div>
+      <div class="hook-card">
+        <span class="hook-name">PreToolUse → pre-write.js</span>
+        <div class="hook-desc">Checks new code against the cerebrum.md Do-Not-Repeat list before Claude writes anything.</div>
+      </div>
+      <div class="hook-card">
+        <span class="hook-name">PostToolUse → post-read.js</span>
+        <div class="hook-desc">Estimates and records token usage for every file read after it completes.</div>
+      </div>
+      <div class="hook-card">
+        <span class="hook-name">PostToolUse → post-write.js</span>
+        <div class="hook-desc">Auto-updates the anatomy index and appends the action to the session memory log.</div>
+      </div>
+      <div class="hook-card">
+        <span class="hook-name">Stop → stop.js</span>
+        <div class="hook-desc">Writes a full session summary to the token ledger when the session ends.</div>
+      </div>
+    </div>
+
+    <p>
+      These hooks warn Claude — they never block it. OpenWolf is advisory, not restrictive. If Claude decides a full read is still necessary 
+      after seeing the anatomy info, it proceeds. The reduction comes from Claude making smarter decisions with better upfront context.
+    </p>
+
+    <!-- HOW TO SET UP -->
+    <div class="sep"><span>Setup</span></div>
+
+    <h2>Getting Started: Two Commands</h2>
+
+    <p>You need Node.js and Claude Code already installed. Then:</p>
+
+    <div class="code-block">
+      <span class="label">Terminal</span>
+      <code>
+<span class="comment"># Step 1 — Install OpenWolf globally<br></span>
+<span class="cmd">npm install -g openwolf<br></span>
+
+<span class="comment"># Step 2 — Navigate to your GitHub project and initialise<br></span>
+<span class="cmd">cd</span> <span class="path">your-github-project/<br></span>
+<span class="cmd">openwolf init<br></span>
+
+<span class="comment"># Step 3 — Use Claude exactly as you always did<br></span>
+<span class="cmd">claude<br></span>
+<span class="comment"># That's it. OpenWolf is watching.<br></span>
+      </code>
+    </div>
+
+    <p>
+      <code>openwolf init</code> creates a <code>.wolf/</code> directory in your project root with sensible defaults. 
+      Everything else — the file indexing, memory updates, token tracking — happens automatically in the background.
+    </p>
+
+    <div class="code-block">
+      <span class="label">Dashboard</span>
+      <code>
+<span class="comment"># After your first session, view the token dashboard<br></span>
+<span class="cmd">openwolf dashboard<br></span>
+
+<span class="comment"># .wolf/ directory structure created by init<br></span>
+<span class="path">.wolf/<br></span>
+<span class="path">  anatomy.md</span>    <span class="comment"># file index — descriptions + token estimates<br></span>
+<span class="path">  cerebrum.md</span>   <span class="comment"># learned preferences + Do-Not-Repeat list<br></span>
+<span class="path">  memory.md</span>     <span class="comment"># session action log<br></span>
+<span class="path">  ledger.md</span>     <span class="comment"># cumulative token usage across sessions<br></span>
+      </code>
+    </div>
+
+    <!-- SESSION FLOW -->
+    <h2>What Happens During a Claude Code Session</h2>
+
+    <div class="flow">
+      <div class="flow-row">
+        <div class="flow-icon user">👤</div>
+        <span class="flow-label">You</span>
+        <span class="flow-detail">Type a message to Claude Code — e.g. "fix the auth bug in the middleware"</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon claude">🤖</div>
+        <span class="flow-label">Claude</span>
+        <span class="flow-detail">Decides to read <code>auth.ts</code> to understand the middleware</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon wolf">🐺</div>
+        <span class="flow-label">OpenWolf</span>
+        <span class="flow-detail">Pre-read hook fires: "anatomy.md says auth.ts is JWT validation middleware, ~420 tokens"</span>
+        <span class="flow-tag saved">context saved</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon claude">🤖</div>
+        <span class="flow-label">Claude</span>
+        <span class="flow-detail">Reads the file. Post-read hook logs the token usage and marks the file as read this session.</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon claude">🤖</div>
+        <span class="flow-label">Claude</span>
+        <span class="flow-detail">Later in the same session, attempts to read <code>auth.ts</code> again</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon wolf">🐺</div>
+        <span class="flow-label">OpenWolf</span>
+        <span class="flow-detail">Pre-read hook warns: "You already read auth.ts this session — 420 tokens already in context"</span>
+        <span class="flow-tag warn">repeat blocked</span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-icon wolf">🐺</div>
+        <span class="flow-label">OpenWolf</span>
+        <span class="flow-detail">Pre-write hook checks cerebrum.md before Claude writes — no known anti-patterns matched, proceed.</span>
+      </div>
+    </div>
+
+    <!-- COMPARISON -->
+    <h2>OpenWolf vs. Bare Claude Code: At a Glance</h2>
+
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Claude Code alone</th>
+          <th>Claude Code + OpenWolf</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Knows file contents before reading</td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="yes">✓ anatomy.md provides descriptions</span></td>
+        </tr>
+        <tr>
+          <td>Detects repeated file reads</td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="yes">✓ Pre-read hook warns on re-reads</span></td>
+        </tr>
+        <tr>
+          <td>Remembers your preferences across sessions</td>
+          <td><span class="no">✗ No — starts fresh every time</span></td>
+          <td><span class="yes">✓ cerebrum.md persists and compounds</span></td>
+        </tr>
+        <tr>
+          <td>Prevents repeated mistakes</td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="yes">✓ Do-Not-Repeat list checked on writes</span></td>
+        </tr>
+        <tr>
+          <td>Token usage visibility</td>
+          <td><span class="no">✗ None</span></td>
+          <td><span class="yes">✓ Dashboard + per-session ledger</span></td>
+        </tr>
+        <tr>
+          <td>Workflow change required</td>
+          <td>—</td>
+          <td><span class="yes">✓ None — type claude as before</span></td>
+        </tr>
+        <tr>
+          <td>External API calls / cost</td>
+          <td>—</td>
+          <td><span class="yes">✓ Zero — pure local file I/O</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CALLOUT -->
+    <div class="callout">
+      <strong>Important caveat:</strong> Token tracking in OpenWolf is estimation-based (character-to-token ratio), accurate to within ~15% — 
+      not exact API counts. And cerebrum.md updates depend on Claude following its own instructions, which happens ~85–90% of the time. 
+      This is v1.0.4 open-source software — real-world tested, but early stage. File issues on GitHub if something breaks.
+    </div>
+
+    <!-- WHO IS IT FOR -->
+    <div class="sep"><span>Who Should Use This</span></div>
+
+    <h2>Is OpenWolf Right for Your Project?</h2>
+
+    <p>
+      OpenWolf's benefits scale directly with project complexity and session length. It delivers the most value when:
+    </p>
+
+    <p>
+      <strong>Your codebase has many interconnected files.</strong> The more files Claude has to navigate, the more likely it is to re-read 
+      files it's already seen. OpenWolf's anatomy index pays off most on projects with 20+ source files.
+    </p>
+    <p>
+      <strong>You work in long sessions.</strong> Token waste from repeated reads accumulates within a session. The longer the session, 
+      the more reads stack up — and the more OpenWolf intercepts.
+    </p>
+    <p>
+      <strong>You correct Claude repeatedly on the same patterns.</strong> If you've told Claude more than once not to do something — 
+      a linting preference, a naming convention, an architectural constraint — cerebrum.md makes those corrections permanent.
+    </p>
+    <p>
+      <strong>You're hitting Claude Code usage limits.</strong> If you're burning through your MAX plan mid-week on a single project, 
+      a 65% average reduction changes the economics substantially.
+    </p>
+    <p>
+      If you're running quick one-off scripts or small single-file tasks, the gains are more modest. OpenWolf is built for sustained, 
+      multi-file development work on real codebases.
+    </p>
+
+    <!-- CLOSING -->
+    <div class="sep"><span>Final Thoughts</span></div>
+
+    <h2>The Takeaway</h2>
+
+    <p>
+      Claude Code is increasingly how developers interact with their codebases. As that becomes true for more teams and larger projects, 
+      the structural inefficiencies compound. Paying token costs for work Claude already did — reading files it already read, learning 
+      preferences it already learned — is a solvable problem.
+    </p>
+    <p>
+      OpenWolf solves it with six hook scripts and a <code>.wolf/</code> directory. No new workflow, no new commands, no external services. 
+      It makes Claude Code progressively smarter about your specific project, session after session.
+    </p>
+    <p>
+      If you spend meaningful time in Claude Code on GitHub projects, the two-command install is worth twenty minutes of your time. 
+      Check your token ledger after a week, and the numbers will tell the story.
+    </p>
+
+    <div class="code-block">
+      <span class="label">Quick Start</span>
+      <code>
+<span class="cmd">npm install -g openwolf<br</span>
+<span class="cmd">cd</span> <span class="path">your-project<br></span>
+<span class="cmd">openwolf init<br></span>
+<span class="comment"># Done. Use claude normally.<br></span>
+      </code>
+    </div>
+
+    <p>
+      🔗 GitHub: <a href="https://github.com/cytostack/openwolf" target="_blank">github.com/cytostack/openwolf</a><br/>
+      🌐 Website: <a href="https://openwolf.com" target="_blank">openwolf.com</a>
+    </p>
+
+  </div><!-- /body -->
+</div><!-- /wrapper -->
+
+<footer class="footer">
+  <div style="margin-top:0.5rem; color:#fff;">Written for developers using Claude Code on real GitHub projects.</div>
+  <div style="margin-top:0.5rem; color:#fff;">
+    Note: OpenWolf is open-source software by Cytostack · MIT License · Not affiliated with Anthropic
+  </div>
+  <div style="margin-top:0.5rem; color:#fff;">
+    And I am not affiliated with either of them 🙂
+  </div>
+</footer>
+
+</body>
+</html>
