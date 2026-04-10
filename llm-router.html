@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LLM Routing — Right Model, Right Job | 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f2ef;
+      color: #1d2226;
+      line-height: 1.75;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0a2a5e 0%, #0d47a1 45%, #1a6b3c 100%);
+      padding: 56px 48px 44px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -80px; left: -40px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 4px 14px; margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 800; line-height: 1.2; margin-bottom: 14px; position: relative; z-index: 1;
+    }
+    .hero-sub {
+      font-size: 16px; opacity: 0.88; max-width: 580px;
+      position: relative; z-index: 1; color: #fff;
+    }
+    .hero-meta {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 28px; font-size: 13px; opacity: 0.75;
+      position: relative; z-index: 1;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Body ── */
+    .body { padding: 48px 48px 56px; }
+
+    /* ── Section Titles ── */
+    .section-title {
+      font-size: 22px; font-weight: 800; color: #0a2a5e;
+      margin: 48px 0 14px; padding-bottom: 10px;
+      border-bottom: 3px solid #e3eaf6;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .emoji { font-size: 24px; }
+    .section-title:first-of-type { margin-top: 0; }
+
+    p { font-size: 15.5px; color: #2d3748; margin-bottom: 16px; }
+    p strong { color: #0a2a5e; }
+    p em { color: #2d3748; }
+
+    /* ── Callout ── */
+    .callout {
+      border-left: 4px solid #0d47a1;
+      background: #eef2fb;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px; margin: 20px 0;
+    }
+    .callout p { margin: 0; font-size: 14.5px; color: #1a365d; }
+    .callout strong { color: #0a2a5e; }
+
+    .callout-warn {
+      border-left: 4px solid #c05000;
+      background: #fff8f0;
+    }
+    .callout-warn p { color: #7a3000; }
+
+    /* ── Flow Diagram ── */
+    .flow-diagram {
+      background: #0d1117; border-radius: 10px;
+      padding: 28px 24px; margin: 20px 0 28px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    .flow-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+    .flow-box {
+      padding: 7px 16px; border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+      border: 1px solid;
+    }
+    .fb-input  { background: rgba(80,220,160,.15); border-color: #50dca0; color: #50dca0; }
+    .fb-router { background: rgba(255,200,50,.12); border-color: #f0c040; color: #f0c040; }
+    .fb-arrow  { color: #8b949e; font-size: 18px; }
+    .branch-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .fb-model {
+      padding: 6px 14px; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+      border: 1px solid; text-align: center;
+    }
+    .fb-claude  { background: rgba(210,120,60,.15); border-color: #d4784a; color: #d4784a; }
+    .fb-openai  { background: rgba(34,200,138,.12); border-color: #22c88a; color: #22c88a; }
+    .fb-gemini  { background: rgba(90,156,248,.15); border-color: #5a9cf8; color: #5a9cf8; }
+    .fb-meta    { background: rgba(180,110,240,.15); border-color: #b86ef0; color: #b86ef0; }
+    .fb-mistral { background: rgba(240,140,60,.15); border-color: #f08c3c; color: #f08c3c; }
+    .fb-sub { font-size: 10px; font-weight: 400; color: #8b949e; margin-top: 2px; }
+
+    /* ── OSS Cards ── */
+    .oss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 28px; }
+    @media(max-width:600px){ .oss-grid { grid-template-columns: 1fr; } }
+    .oss-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 22px 20px;
+      position: relative; overflow: hidden;
+    }
+    .oss-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .oss-litellm::before  { background: #d4c000; }
+    .oss-routellm::before { background: #d4006a; }
+    .oss-icon { font-size: 28px; margin-bottom: 8px; }
+    .oss-name { font-size: 15px; font-weight: 700; color: #0a2a5e; margin-bottom: 4px; }
+    .oss-meta { font-size: 12px; color: #4a5568; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+    .oss-desc { font-size: 13.5px; color: #2d3748; line-height: 1.6; margin-bottom: 10px; }
+    .oss-list { list-style: none; padding: 0; }
+    .oss-list li { font-size: 13px; color: #2d3748; padding: 3px 0; }
+    .oss-list li::before { content: '→ '; color: #0d47a1; font-weight: 700; }
+
+    /* ── Model Cards ── */
+    .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 28px; }
+    @media(max-width:640px){ .model-grid { grid-template-columns: 1fr; } }
+    .model-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 20px 18px;
+      position: relative; overflow: hidden;
+    }
+    .model-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .mc-claude::before  { background: #d4784a; }
+    .mc-openai::before  { background: #22c88a; }
+    .mc-gemini::before  { background: #5a9cf8; }
+    .mc-meta::before    { background: #b86ef0; }
+    .mc-mistral::before { background: #f08c3c; }
+    .mc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .mc-icon { font-size: 26px; }
+    .mc-name   { font-size: 14px; font-weight: 700; color: #0a2a5e; }
+    .mc-vendor { font-size: 12px; color: #4a5568; font-family: 'JetBrains Mono', monospace; }
+    .mc-price {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;
+      color: #1a365d; line-height: 1.6;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .tag-use   { background: #e6f4ee; color: #1a5c36; border-radius: 4px; font-size: 11.5px; font-weight: 600; padding: 2px 8px; }
+    .tag-avoid { background: #fde8e8; color: #8b1a1a; border-radius: 4px; font-size: 11.5px; font-weight: 600; padding: 2px 8px; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
+    .pc-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .pc-pros h4 { color: #2f855a; }
+    .pc-cons h4 { color: #c53030; }
+    .pc-col ul { list-style: none; padding: 0; }
+    .pc-col ul li { font-size: 12.5px; color: #2d3748; padding: 2px 0; line-height: 1.5; }
+    .pc-pros ul li::before { content: '✓ '; color: #2f855a; font-weight: 700; }
+    .pc-cons ul li::before { content: '✗ '; color: #c53030; font-weight: 700; }
+
+    /* ── Routing Table ── */
+    .table-wrap { overflow-x: auto; margin: 20px 0 28px; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: #0d47a1; color: #fff; }
+    thead th { padding: 12px 16px; text-align: left; font-weight: 700; font-size: 13px; }
+    tbody tr:nth-child(even) { background: #f7f9fc; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody tr:hover { background: #eef2fb; }
+    td { padding: 11px 16px; color: #2d3748; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-size: 13.5px; }
+    td:first-child { font-weight: 600; color: #1a365d; font-size: 14px; }
+    .td-note { font-size: 13px; color: #4a5568; font-style: italic; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 11.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-claude  { background: #fde8d8; color: #8b3a10; }
+    .badge-openai  { background: #d8f4ea; color: #145c36; }
+    .badge-gemini  { background: #dceeff; color: #0a3580; }
+    .badge-meta    { background: #eeddff; color: #5a0ea0; }
+    .badge-mistral { background: #fde8cc; color: #7a3800; }
+
+    /* ── Fallback Chain ── */
+    .fallback-chain {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 8px 0; margin: 20px 0 28px;
+    }
+    .chain-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 16px 22px; border-bottom: 1px solid #e2e8f0;
+    }
+    .chain-row:last-child { border-bottom: none; }
+    .chain-step {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #0d47a1; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+    .chain-content h4 { font-size: 14px; font-weight: 700; color: #0a2a5e; margin-bottom: 4px; }
+    .chain-content p  { font-size: 13.5px; color: #2d3748; margin: 0; }
+    .chain-trigger {
+      font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+      color: #c05000; margin-top: 6px; background: #fff8f0;
+      border-radius: 4px; padding: 3px 8px; display: inline-block;
+    }
+
+    /* ── VS Comparison ── */
+    .vs-box {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 20px 22px; margin: 20px 0;
+    }
+    .vs-box h4 { font-size: 14px; font-weight: 700; color: #0a2a5e; margin-bottom: 14px; }
+    .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:540px){ .vs-grid { grid-template-columns: 1fr; } }
+    .vs-col-head { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .vs-litellm  { color: #7a6800; }
+    .vs-routellm { color: #8b005a; }
+    .vs-col ul { list-style: none; padding: 0; }
+    .vs-col ul li { font-size: 13px; color: #2d3748; padding: 3px 0; }
+    .vs-col ul li::before { content: '→ '; color: #0d47a1; font-weight: 700; }
+    .vs-tip {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0;
+      font-size: 13px; color: #1a365d; font-style: italic;
+    }
+
+    /* ── Best Practices Grid ── */
+    .bp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 28px; }
+    @media(max-width:600px){ .bp-grid { grid-template-columns: 1fr; } }
+    .bp-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 18px 16px;
+    }
+    .bp-number { font-size: 28px; font-weight: 800; color: #e2e8f0; line-height: 1; margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+    .bp-card h3 { font-size: 13.5px; font-weight: 700; color: #0a2a5e; margin-bottom: 5px; }
+    .bp-card p  { font-size: 13px; color: #2d3748; margin: 0; line-height: 1.6; }
+
+    /* ── Accordion ── */
+    .accordion { margin: 20px 0; }
+    .acc-item  { border-bottom: 1px solid #e2e8f0; }
+    .acc-trigger {
+      width: 100%; background: none; border: none;
+      padding: 14px 0; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14.5px;
+      font-weight: 600; color: #0a2a5e; text-align: left;
+    }
+    .acc-trigger:hover { color: #0d47a1; }
+    .acc-icon { font-size: 18px; color: #4a5568; transition: transform .25s; }
+    .acc-item.open .acc-icon { transform: rotate(45deg); color: #0d47a1; }
+    .acc-body { display: none; padding-bottom: 14px; font-size: 14px; color: #2d3748; line-height: 1.7; }
+    .acc-item.open .acc-body { display: block; }
+
+    /* ── Cost Estimator ── */
+    .estimator {
+      background: #eef2fb; border: 1px solid #c5d5f0;
+      border-radius: 10px; padding: 28px 24px; margin: 20px 0 28px;
+    }
+    .estimator h3 { font-size: 18px; font-weight: 700; color: #0a2a5e; margin-bottom: 18px; }
+    .est-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:560px){ .est-grid { grid-template-columns: 1fr; } }
+    .est-field label { display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #1a365d; margin-bottom: 5px; }
+    .est-field input, .est-field select {
+      width: 100%; background: #fff; border: 1px solid #c5d5f0;
+      border-radius: 6px; padding: 8px 10px; color: #1d2226;
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      outline: none; transition: border-color .2s;
+    }
+    .est-field input:focus, .est-field select:focus { border-color: #0d47a1; }
+    .est-result {
+      margin-top: 16px; padding: 16px;
+      background: #fff; border: 1px solid #c5d5f0; border-radius: 8px;
+    }
+    .est-result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
+    .est-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #4a5568; margin-bottom: 4px; }
+    .est-number { font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif; }
+    .est-sub { font-size: 11.5px; color: #4a5568; margin-top: 2px; }
+
+    /* ── CTA ── */
+    .cta {
+      background: linear-gradient(135deg, #0a2a5e, #1a6b3c);
+      border-radius: 12px; padding: 32px 30px; color: #fff;
+      margin-top: 48px; text-align: center;
+    }
+    .cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .cta p  { font-size: 14.5px; opacity: 0.9; margin: 0; color: #fff; }
+
+    /* ── Tags ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+    .tag  { background: #e8eef8; color: #0a2a5e; border-radius: 20px; font-size: 12.5px; font-weight: 600; padding: 4px 14px; }
+
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 36px 0; }
+
+    a { color: #0d47a1; text-decoration: none; border-bottom: 1px solid #b3c7e8; transition: color .15s; }
+    a:hover { color: #512da8; border-color: #9c6fda; }
+
+    @media(max-width:600px){
+      .hero, .body { padding: 32px 24px; }
+      .model-grid, .bp-grid, .est-grid, .est-result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Stop Using One LLM for Everything — You're Cutting Tomatoes with a Sword 🗡️</h1>
+    <p class="hero-sub">How dynamic LLM routing cuts costs by up to 85% without sacrificing quality — a practical guide to matching every task to the right model in 2026.</p>
+    <div class="hero-meta">
+      <span>April 2026</span>
+      <span>⏱ 10 min read</span>
+      <span>✍️ Utkarsh Swarnkar</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p>Most AI-powered products do something quietly expensive every day: they route 100% of their queries to their smartest, most expensive model. That's like hiring a Michelin-star chef to make toast. Every. Single. Morning.</p>
+
+    <p>The fix has a name: <strong>LLM Routing</strong>. It's the practice of dynamically selecting the cheapest model capable of handling each request reliably — not the best model, the <em>right</em> model. Teams doing this well report <strong>50–85% cost reduction</strong> with negligible quality impact. In 2026, with capable models available at $0.10 per million tokens, the economics have never been more compelling.</p>
+
+    <div class="callout">
+      <p>💡 <strong>"Why send a rocket to cross the street?"</strong> — Classify intent with Mistral Small, write documents with Claude Sonnet 4.6, handle multimodal with Gemini Flash, run private RAG on-prem with Llama 3.3. Let each model do what it was born for.</p>
+    </div>
+
+    <!-- ROUTING DIAGRAM -->
+    <div class="section-title"><span class="emoji">⚡</span> How Routing Works</div>
+
+    <p>A router sits between your application and your LLM providers. Every incoming request is classified — by complexity, task type, latency requirement, or data sensitivity — and dispatched to the most appropriate model. Fallback chains ensure reliability when any provider is down.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-box fb-input">USER QUERY</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-router">⚡ ROUTER LAYER</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-input" style="border-color:#8b949e;color:#8b949e;background:rgba(139,148,158,.1)">TASK CLASSIFY</div>
+      </div>
+      <div class="fb-arrow" style="transform:rotate(90deg)">→</div>
+      <div class="branch-row">
+        <div class="fb-model fb-claude">Claude Opus/Sonnet<div class="fb-sub">Reasoning · Writing · Code</div></div>
+        <div class="fb-model fb-openai">GPT-5.4 / o4-mini<div class="fb-sub">Tools · Terminal · Vision</div></div>
+        <div class="fb-model fb-gemini">Gemini 2.0 Flash<div class="fb-sub">Multimodal · Grounding</div></div>
+        <div class="fb-model fb-meta">Llama 3.3 70B<div class="fb-sub">Private Data · On-Prem</div></div>
+        <div class="fb-model fb-mistral">Mistral Small<div class="fb-sub">Classify · Fast · Cheap</div></div>
+      </div>
+    </div>
+
+    <!-- OSS TOOLS -->
+    <div class="section-title"><span class="emoji">🛠️</span> The Open-Source Ecosystem — Don't Build From Scratch</div>
+
+    <p>Before writing a single line of custom routing logic, know that two excellent open-source projects already solve the hard parts. <strong>Use them.</strong></p>
+
+    <div class="oss-grid">
+      <div class="oss-card oss-litellm">
+        <div class="oss-icon">🔀</div>
+        <div class="oss-name">LiteLLM</div>
+        <div class="oss-meta">github.com/BerriAI/litellm · 17k+ ⭐</div>
+        <p class="oss-desc">A unified API gateway wrapping 100+ LLM providers behind one OpenAI-compatible interface. The Nginx of LLM infrastructure — routing, load balancing, fallbacks, rate limiting, spend tracking, semantic auto-routing.</p>
+        <ul class="oss-list">
+          <li>100+ providers via single endpoint</li>
+          <li>RPM/TPM-aware load balancing with Redis</li>
+          <li>Semantic auto-routing via utterance embeddings</li>
+          <li>Per-user and per-team spend tracking</li>
+          <li>Cooldown + retry on provider failure</li>
+        </ul>
+      </div>
+      <div class="oss-card oss-routellm">
+        <div class="oss-icon">🧠</div>
+        <div class="oss-name">RouteLLM</div>
+        <div class="oss-meta">github.com/lm-sys/RouteLLM · LMSYS Research</div>
+        <p class="oss-desc">ML-driven routing from the Chatbot Arena team. Uses trained classifiers to route each query to the cheapest model that can handle it. Proven 85% cost reduction, 95% quality retention. Drop-in OpenAI replacement.</p>
+        <ul class="oss-list">
+          <li>4 pre-trained routers (MF, BERT, Causal LLM, SW-Ranking)</li>
+          <li>Trained on millions of Chatbot Arena preference votes</li>
+          <li>Calibration tool — dial in cost/quality threshold</li>
+          <li>Generalizes beyond its training model pair</li>
+          <li>Status: stable, last updated Aug 2024</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="vs-box">
+      <h4>LiteLLM vs RouteLLM — When to Use Which</h4>
+      <div class="vs-grid">
+        <div class="vs-col">
+          <div class="vs-col-head vs-litellm">USE LITELLM WHEN</div>
+          <ul>
+            <li>You need multi-provider reliability</li>
+            <li>Fallbacks &amp; load balancing are priorities</li>
+            <li>You have multi-tenant systems</li>
+            <li>You need per-team spend tracking</li>
+            <li>Rule-based routing is sufficient</li>
+          </ul>
+        </div>
+        <div class="vs-col">
+          <div class="vs-col-head vs-routellm">USE ROUTELLM WHEN</div>
+          <ul>
+            <li>Cost reduction is the primary goal</li>
+            <li>Query complexity varies widely</li>
+            <li>You want ML-driven routing decisions</li>
+            <li>Strong/weak model pair is your pattern</li>
+            <li>You can tolerate stable-not-evolving state</li>
+          </ul>
+        </div>
+      </div>
+      <p class="vs-tip">💡 <strong>Power move:</strong> Use both together — RouteLLM makes the strong/weak routing decision; LiteLLM handles multi-provider infrastructure, fallbacks, and observability around it.</p>
+    </div>
+
+    <!-- MODEL PROFILES -->
+    <div class="section-title"><span class="emoji">🤖</span> 2026 Model Profiles — Know Your Arsenal</div>
+
+    <p>The landscape looks nothing like 2024. Pricing has fallen, capabilities have converged, and smart routing now depends on subtler signals than raw "best model wins."</p>
+
+    <div class="model-grid">
+
+      <div class="model-card mc-claude">
+        <div class="mc-header">
+          <div class="mc-icon">🧠</div>
+          <div><div class="mc-name">Claude Opus 4.6</div><div class="mc-vendor">Anthropic · Current Flagship</div></div>
+        </div>
+        <div class="mc-price">Input: $5 / 1M · Output: $25 / 1M<br>1M token context · Prompt caching available</div>
+        <div class="tag-list">
+          <span class="tag-use">Complex Reasoning</span>
+          <span class="tag-use">Creative Writing</span>
+          <span class="tag-use">Multi-turn Dialogue</span>
+          <span class="tag-avoid">❌ Simple tasks</span>
+          <span class="tag-avoid">❌ High-volume ops</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>#1 Chatbot Arena (ELO 1503)</li><li>Best long-context coherence</li><li>Style &amp; tone mastery</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>$25/M output is steep</li><li>Overkill for 60% of tasks</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card mc-claude">
+        <div class="mc-header">
+          <div class="mc-icon">⚡</div>
+          <div><div class="mc-name">Claude Sonnet 4.6</div><div class="mc-vendor">Anthropic · Best Value 2026</div></div>
+        </div>
+        <div class="mc-price">Input: $3 / 1M · Output: $15 / 1M<br>Same price as Sonnet 4.5 · Massive capability jump</div>
+        <div class="tag-list">
+          <span class="tag-use">Daily Coding</span>
+          <span class="tag-use">Computer Use (94%)</span>
+          <span class="tag-use">Office &amp; Finance #1</span>
+          <span class="tag-avoid">❌ Heavy multimodal</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>79.6% SWE-bench Verified</li><li>Devs prefer it 70% of the time</li><li>5x cheaper than Opus</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>Slightly weaker pure reasoning</li><li>Lower ELO in creative writing</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card mc-openai">
+        <div class="mc-header">
+          <div class="mc-icon">🛠️</div>
+          <div><div class="mc-name">GPT-5.4</div><div class="mc-vendor">OpenAI · Unified Reasoning</div></div>
+        </div>
+        <div class="mc-price">Input: $2.50 / 1M · Output: $15 / 1M<br>o4-mini: $0.25 / $1.10 for simpler tasks</div>
+        <div class="tag-list">
+          <span class="tag-use">Terminal/Agentic Coding</span>
+          <span class="tag-use">Vision &amp; Multimodal</span>
+          <span class="tag-use">Tool/Function Calling</span>
+          <span class="tag-avoid">❌ Long-form writing</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>Best Terminal-Bench 2.0 (75.1%)</li><li>Leads MMMU Pro (79.5%)</li><li>Cheapest frontier input price</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>Lower writing satisfaction ELO</li><li>Less consistent code style</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card mc-gemini">
+        <div class="mc-header">
+          <div class="mc-icon">🎥</div>
+          <div><div class="mc-name">Gemini 2.0 Flash</div><div class="mc-vendor">Google DeepMind</div></div>
+        </div>
+        <div class="mc-price">Input: $0.10 / 1M · Output: $0.40 / 1M<br>Cheapest frontier option by far</div>
+        <div class="tag-list">
+          <span class="tag-use">Video/Audio Multimodal</span>
+          <span class="tag-use">Google Search Grounding</span>
+          <span class="tag-use">High-volume cheap tasks</span>
+          <span class="tag-avoid">❌ Complex reasoning</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>Native 1hr+ video understanding</li><li>Real-time search grounding</li><li>1M+ context window</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>Inconsistent on complex tasks</li><li>Quality spikes variable</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card mc-meta">
+        <div class="mc-header">
+          <div class="mc-icon">🦙</div>
+          <div><div class="mc-name">Llama 3.3 70B</div><div class="mc-vendor">Meta · Open Weights</div></div>
+        </div>
+        <div class="mc-price">Self-hosted: ~$0.05–0.25 / 1M (infra)<br>Groq API: $0.59 in / $0.79 out</div>
+        <div class="tag-list">
+          <span class="tag-use">Private / HIPAA Data</span>
+          <span class="tag-use">On-Prem Compliance</span>
+          <span class="tag-use">Fine-tunable</span>
+          <span class="tag-avoid">❌ No internet access</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>Zero data leaves your infra</li><li>Full control, fine-tunable</li><li>Open weights</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>You own reliability</li><li>Weaker abstract reasoning</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card mc-mistral">
+        <div class="mc-header">
+          <div class="mc-icon">🏎️</div>
+          <div><div class="mc-name">Mistral Small 3.1</div><div class="mc-vendor">Mistral AI · The Router's Router</div></div>
+        </div>
+        <div class="mc-price">Input: $0.10 / 1M · Output: $0.30 / 1M<br>Sub-300ms latency · Can power the router itself</div>
+        <div class="tag-list">
+          <span class="tag-use">Intent Classification</span>
+          <span class="tag-use">High-volume Summarization</span>
+          <span class="tag-use">Can be the router</span>
+          <span class="tag-avoid">❌ Complex reasoning</span>
+        </div>
+        <div class="pros-cons">
+          <div class="pc-col pc-pros"><h4>Pros</h4>
+            <ul><li>Dirt cheap ($0.10/M in)</li><li>Sub-300ms responses</li><li>Great classifier performance</li></ul>
+          </div>
+          <div class="pc-col pc-cons"><h4>Cons</h4>
+            <ul><li>Limited reasoning depth</li><li>No native vision</li></ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROUTING TABLE -->
+    <div class="section-title"><span class="emoji">📋</span> Task → Model Routing Guide</div>
+
+    <p>The definitive cheat sheet. Bookmark it. Never hardcode one model for all traffic again.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Task Type</th><th>Primary Model</th><th>Fallback</th><th>Why This Routing</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Daily Coding / Code Review</td><td><span class="badge badge-claude">Claude Sonnet 4.6</span></td><td><span class="badge badge-openai">GPT-5.4</span></td><td class="td-note">Sonnet 4.6 preferred 70% by devs, near-Opus quality at 5x lower cost</td></tr>
+          <tr><td>Complex Multi-file Refactor</td><td><span class="badge badge-claude">Claude Opus 4.6</span></td><td><span class="badge badge-claude">Claude Sonnet 4.6</span></td><td class="td-note">Opus leads SWE-bench (80.8%), best long-context coherence</td></tr>
+          <tr><td>Terminal / Agentic Coding</td><td><span class="badge badge-openai">GPT-5.4</span></td><td><span class="badge badge-claude">Claude Sonnet 4.6</span></td><td class="td-note">GPT-5.4 dominates Terminal-Bench 2.0 (75.1% vs 59.1%)</td></tr>
+          <tr><td>Creative Writing / Long-form</td><td><span class="badge badge-claude">Claude Opus 4.6</span></td><td><span class="badge badge-claude">Claude Sonnet 4.6</span></td><td class="td-note">Opus leads Chatbot Arena ELO by 65+ points on style and dialogue</td></tr>
+          <tr><td>Video / Audio Multimodal</td><td><span class="badge badge-gemini">Gemini 2.0 Flash</span></td><td><span class="badge badge-openai">GPT-5.4 Vision</span></td><td class="td-note">Only tier with native 1hr+ video; Flash is 25x cheaper than Opus</td></tr>
+          <tr><td>Image / Chart Analysis</td><td><span class="badge badge-openai">GPT-5.4</span></td><td><span class="badge badge-claude">Claude Opus 4.6</span></td><td class="td-note">GPT-5.4 leads MMMU Pro multimodal (79.5% vs 77.3%)</td></tr>
+          <tr><td>Intent Classification / Routing</td><td><span class="badge badge-mistral">Mistral Small</span></td><td><span class="badge badge-meta">Llama 3.3 8B</span></td><td class="td-note">Sub-300ms, $0.10/M — can literally power the router itself</td></tr>
+          <tr><td>Private / Regulated Data RAG</td><td><span class="badge badge-meta">Llama 3.3 70B</span></td><td><span class="badge badge-claude">Claude (Azure Private)</span></td><td class="td-note">Data stays on-prem — HIPAA/SOC2 compliant</td></tr>
+          <tr><td>Office / Financial Documents</td><td><span class="badge badge-claude">Claude Sonnet 4.6</span></td><td><span class="badge badge-claude">Claude Opus 4.6</span></td><td class="td-note">Sonnet 4.6 is #1 on GDPval-AA (1633 Elo) and Finance Agent (63.3%)</td></tr>
+          <tr><td>Real-time Web Grounding</td><td><span class="badge badge-gemini">Gemini 2.0 Flash</span></td><td><span class="badge badge-openai">GPT-5.4 + Search</span></td><td class="td-note">Native Google Search grounding; cheapest per token</td></tr>
+          <tr><td>High-volume Summarization</td><td><span class="badge badge-mistral">Mistral Small</span></td><td><span class="badge badge-gemini">Gemini 2.0 Flash</span></td><td class="td-note">Both sub-$0.50/M — compression tasks need no frontier model</td></tr>
+          <tr><td>Simple Customer Support</td><td><span class="badge badge-openai">o4-mini</span></td><td><span class="badge badge-mistral">Mistral Small</span></td><td class="td-note">o4-mini at $0.25/$1.10 handles FAQ-class queries reliably</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FALLBACKS -->
+    <div class="section-title"><span class="emoji">🛡️</span> Fallback Chains That Hold Under Fire</div>
+
+    <p>A router with no fallback strategy is a single point of failure dressed in a tuxedo. Every production deployment needs graceful degradation baked in from day one — not retrofitted at 3am during an outage.</p>
+
+    <div class="fallback-chain">
+      <div class="chain-row">
+        <div class="chain-step">1</div>
+        <div class="chain-content">
+          <h4>Primary Model — Optimal Quality</h4>
+          <p>Route to the best-fit model for the task type. Full capability, optimal quality, normal pricing.</p>
+          <span class="chain-trigger">TRIGGER IF: HTTP 429/500 · timeout &gt;5s · daily cost threshold exceeded</span>
+        </div>
+      </div>
+      <div class="chain-row">
+        <div class="chain-step">2</div>
+        <div class="chain-content">
+          <h4>Secondary Model — Same Tier, Different Provider</h4>
+          <p>Swap provider while preserving task type. Claude Opus down? Try GPT-5.4. Both degraded? Promote Sonnet 4.6 as temporary primary with simplified prompt.</p>
+          <span class="chain-trigger">TRIGGER IF: secondary fails · latency SLA breach · both primary providers degraded</span>
+        </div>
+      </div>
+      <div class="chain-row">
+        <div class="chain-step">3</div>
+        <div class="chain-content">
+          <h4>Degraded Mode — Lighter Model, Simplified Prompt</h4>
+          <p>Drop to Mistral Small or o4-mini. Truncate prompts. Accept lower quality to maintain uptime. Log all degraded responses for async replay when primary recovers.</p>
+          <span class="chain-trigger">TRIGGER IF: all frontier models unavailable · monthly budget ceiling hit</span>
+        </div>
+      </div>
+      <div class="chain-row">
+        <div class="chain-step">4</div>
+        <div class="chain-content">
+          <h4>Rule-Based Response — Zero LLM</h4>
+          <p>Deterministic regex + template responses for common patterns. No AI, 100% uptime. Cache top-50 frequent queries. Return "I'll follow up" + auto-create a ticket.</p>
+          <span class="chain-trigger">TRIGGER IF: all LLMs unavailable · emergency cost kill-switch activated</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">How do I handle context window mismatches in fallbacks? <span class="acc-icon">+</span></button>
+        <div class="acc-body">Claude Opus 4.6 and Sonnet 4.6 support 1M token context. GPT-5.4 supports 128K. If your primary uses the full context and your fallback is GPT-5.4, your fallback chain must include an automatic summarization step to compress below 128K. Plan this upfront in your prompt adapter layer — retrofitting it under production pressure is painful.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">LiteLLM fallback config vs custom routing logic? <span class="acc-icon">+</span></button>
+        <div class="acc-body">Start with LiteLLM's built-in fallback config — it handles cooldown_time, allowed_fails, num_retries, and provider-level routing out of the box. Build custom logic only when you need task-aware fallbacks (e.g., "fall back to Llama only for HIPAA-scoped requests"). LiteLLM covers 80% of production cases cleanly.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">How does RouteLLM's threshold calibration work? <span class="acc-icon">+</span></button>
+        <div class="acc-body">RouteLLM's calibration tool lets you set a target strong-model percentage — e.g. "route 15% of queries to GPT-5.4, 85% to o4-mini." Start conservative at 5–15% to the strong model, inspect outputs for a week, then adjust. The Matrix Factorization (mf) router is the most battle-tested option.</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- BEST PRACTICES -->
+    <div class="section-title"><span class="emoji">✅</span> Best Practices from the Trenches</div>
+
+    <p>Distilled from teams running millions of routed LLM calls a day in 2026.</p>
+
+    <div class="bp-grid">
+      <div class="bp-card"><div class="bp-number">01</div><h3>The Router Needs a Model Too</h3><p>Use Mistral Small to classify incoming queries. Sub-300ms at $0.10/M — routing overhead pays for itself within minutes of traffic.</p></div>
+      <div class="bp-card"><div class="bp-number">02</div><h3>Sonnet Before Opus, Always</h3><p>In 2026, Sonnet 4.6 beats Opus 4.5 on coding 59% of the time. Default to Sonnet; escalate to Opus only when complexity scoring demands it.</p></div>
+      <div class="bp-card"><div class="bp-number">03</div><h3>Log Model + Cost + Outcome</h3><p>Log which model handled each request, latency, token count, dollar cost, and a quality proxy. Without this data, you're routing blind.</p></div>
+      <div class="bp-card"><div class="bp-number">04</div><h3>Semantic Cache First</h3><p>Embedding-similarity caching (Redis + pgvector) can eliminate 30–60% of LLM calls on FAQ/support workloads before routing even fires.</p></div>
+      <div class="bp-card"><div class="bp-number">05</div><h3>Hard Budget Ceilings</h3><p>Implement per-user, per-feature, and global daily cost ceilings. A runaway agent loop can bankrupt your API budget in hours without circuit breakers.</p></div>
+      <div class="bp-card"><div class="bp-number">06</div><h3>Version Prompts with Models</h3><p>Sonnet 4.6 behaves differently than Sonnet 4.5 on identical prompts. Version your templates alongside model identifiers or risk silent regressions.</p></div>
+      <div class="bp-card"><div class="bp-number">07</div><h3>A/B Test Your Thresholds</h3><p>Run shadow traffic: same query to multiple models, eval outputs monthly. Routing is not set-and-forget — traffic distribution shifts constantly.</p></div>
+      <div class="bp-card"><div class="bp-number">08</div><h3>Data Residency Is Non-Negotiable</h3><p>Never route PII or regulated data to external APIs without legal clearance. Self-hosted Llama 3.3 or Azure private endpoints for HIPAA/GDPR workloads.</p></div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- COST ESTIMATOR -->
+    <div class="section-title"><span class="emoji">💸</span> Monthly Savings Estimator</div>
+
+    <p>Plug in your numbers and see what intelligent routing saves versus all-in on one frontier model.</p>
+
+    <div class="estimator">
+      <h3>🧮 LLM Routing Cost Calculator</h3>
+      <div class="est-grid">
+        <div class="est-field"><label>Daily API Requests</label><input type="number" id="dailyReqs" value="10000" min="1" oninput="calcCost()"></div>
+        <div class="est-field"><label>Avg Output Tokens / Request</label><input type="number" id="avgTokens" value="600" min="1" oninput="calcCost()"></div>
+        <div class="est-field">
+          <label>Current Model (All Traffic)</label>
+          <select id="currentModel" onchange="calcCost()">
+            <option value="25">Claude Opus 4.6 ($25/M out)</option>
+            <option value="15" selected>Claude Sonnet 4.6 ($15/M out)</option>
+            <option value="15">GPT-5.4 ($15/M out)</option>
+            <option value="5">Gemini 1.5 Pro ($5/M out)</option>
+          </select>
+        </div>
+        <div class="est-field"><label>% Routable to Mistral Small</label><input type="number" id="simplePct" value="55" min="0" max="100" oninput="calcCost()"></div>
+      </div>
+      <div class="est-result" id="estResult"></div>
+    </div>
+
+    <div class="cta">
+      <h3>Stop paying frontier prices for toast-making tasks. 🍞</h3>
+      <p>Route smart. Cache aggressively. Monitor continuously. The models will only get cheaper — but the teams that route well will always have the edge.</p>
+    </div>
+
+    <div class="tags">
+      <span class="tag">#LLMRouting</span>
+      <span class="tag">#AIEngineering</span>
+      <span class="tag">#MLOps</span>
+      <span class="tag">#LiteLLM</span>
+      <span class="tag">#RouteLLM</span>
+      <span class="tag">#GenAI</span>
+      <span class="tag">#CostOptimization</span>
+      <span class="tag">#Claude</span>
+      <span class="tag">#GPT5</span>
+      <span class="tag">#SoftwareEngineering</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function toggleAcc(btn) { btn.closest('.acc-item').classList.toggle('open'); }
+
+  function calcCost() {
+    const daily = parseFloat(document.getElementById('dailyReqs').value) || 0;
+    const tokens = parseFloat(document.getElementById('avgTokens').value) || 0;
+    const rate   = parseFloat(document.getElementById('currentModel').value) || 15;
+    const pct    = Math.min(100, Math.max(0, parseFloat(document.getElementById('simplePct').value))) / 100;
+    const mistral = 0.30;
+
+    const monthly = daily * 30 * tokens;
+    const current = (monthly / 1e6) * rate;
+    const routed  = (monthly * pct / 1e6) * mistral + (monthly * (1 - pct) / 1e6) * rate;
+    const savings = current - routed;
+    const savePct = current > 0 ? (savings / current * 100).toFixed(0) : 0;
+    const fmt = n => '$' + n.toLocaleString('en-US', {maximumFractionDigits: 0});
+
+    document.getElementById('estResult').innerHTML = `
+      <div class="est-result-grid">
+        <div><div class="est-label">Without Routing</div><div class="est-number" style="color:#c53030">${fmt(current)}</div><div class="est-sub">/month</div></div>
+        <div><div class="est-label">With Smart Routing</div><div class="est-number" style="color:#276749">${fmt(routed)}</div><div class="est-sub">/month</div></div>
+        <div><div class="est-label">You Save</div><div class="est-number" style="color:#0d47a1">${fmt(savings)}</div><div class="est-sub" style="color:#0d47a1;font-weight:700">${savePct}% reduction</div></div>
+      </div>`;
+  }
+  calcCost();
+</script>
+</body>
+</html>
