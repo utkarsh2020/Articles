@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Skills — Teaching Your AI Tools to Think Like You | 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f2ef;
+      color: #1d2226;
+      line-height: 1.75;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0a2a5e 0%, #0d47a1 45%, #1a6b3c 100%);
+      padding: 56px 48px 44px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.06); }
+    .hero::after  { content:''; position:absolute; bottom:-80px; left:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 4px 14px; margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 800; line-height: 1.2; margin-bottom: 14px; position: relative; z-index: 1;
+    }
+    .hero-sub {
+      font-size: 16px; opacity: 0.88; max-width: 580px;
+      position: relative; z-index: 1; color: #fff;
+    }
+    .hero-meta {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 28px; font-size: 13px; opacity: 0.75;
+      position: relative; z-index: 1;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Body ── */
+    .body { padding: 48px 48px 56px; }
+
+    /* ── Section Titles ── */
+    .section-title {
+      font-size: 22px; font-weight: 800; color: #0a2a5e;
+      margin: 48px 0 14px; padding-bottom: 10px;
+      border-bottom: 3px solid #e3eaf6;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .emoji { font-size: 24px; }
+    .section-title:first-of-type { margin-top: 0; }
+
+    p { font-size: 15.5px; color: #2d3748; margin-bottom: 16px; }
+    p strong { color: #0a2a5e; }
+    p em { color: #2d3748; }
+
+    /* ── Callout ── */
+    .callout {
+      border-left: 4px solid #0d47a1;
+      background: #eef2fb;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px; margin: 20px 0;
+    }
+    .callout p { margin: 0; font-size: 14.5px; color: #1a365d; }
+    .callout strong { color: #0a2a5e; }
+    .callout-warn { border-left-color: #c05000; background: #fff8f0; }
+    .callout-warn p { color: #7a3000; }
+
+    /* ── Flow / Anatomy Diagram ── */
+    .flow-diagram {
+      background: #0d1117; border-radius: 10px;
+      padding: 28px 24px; margin: 20px 0 28px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .flow-title { color: #8b949e; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 18px; text-align: center; }
+    .flow-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+    .flow-box {
+      padding: 7px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; border: 1px solid;
+    }
+    .fb-green  { background: rgba(80,220,160,.15); border-color: #50dca0; color: #50dca0; }
+    .fb-yellow { background: rgba(255,200,50,.12); border-color: #f0c040; color: #f0c040; }
+    .fb-blue   { background: rgba(90,156,248,.15); border-color: #5a9cf8; color: #5a9cf8; }
+    .fb-purple { background: rgba(180,110,240,.15); border-color: #b86ef0; color: #b86ef0; }
+    .fb-orange { background: rgba(240,140,60,.15); border-color: #f08c3c; color: #f08c3c; }
+    .fb-grey   { background: rgba(139,148,158,.1); border-color: #8b949e; color: #8b949e; }
+    .fb-arrow  { color: #8b949e; font-size: 18px; }
+    .anatomy-block {
+      border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; margin: 10px 0;
+      position: relative;
+    }
+    .anatomy-label {
+      position: absolute; top: -10px; left: 14px;
+      background: #0d1117; padding: 0 8px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+    }
+    .anatomy-line { color: #e6edf3; font-size: 12px; line-height: 2; }
+    .anatomy-line .key { color: #79c0ff; }
+    .anatomy-line .val { color: #a5d6ff; }
+    .anatomy-line .cmt { color: #8b949e; }
+    .anatomy-line .str { color: #a8ff78; }
+    .anatomy-line .kw  { color: #f0c040; }
+
+    /* ── Tool Cards ── */
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 28px; }
+    @media(max-width:600px){ .tool-grid { grid-template-columns: 1fr; } }
+    .tool-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 22px 20px;
+      position: relative; overflow: hidden;
+    }
+    .tool-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .tc-claude::before   { background: #d4784a; }
+    .tc-cursor::before   { background: #5a9cf8; }
+    .tc-code::before     { background: #22c88a; }
+    .tc-continue::before { background: #b86ef0; }
+    .tc-aider::before    { background: #f0c040; }
+    .tc-copilot::before  { background: #e36fa0; }
+    .tool-icon { font-size: 28px; margin-bottom: 8px; }
+    .tool-name { font-size: 15px; font-weight: 700; color: #0a2a5e; margin-bottom: 3px; }
+    .tool-type { font-size: 12px; color: #4a5568; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+    .tool-desc { font-size: 13.5px; color: #2d3748; line-height: 1.6; margin-bottom: 12px; }
+    .tool-list { list-style: none; padding: 0; }
+    .tool-list li { font-size: 13px; color: #2d3748; padding: 3px 0; }
+    .tool-list li::before { content: '→ '; color: #0d47a1; font-weight: 700; }
+
+    /* ── Example Cards (Developer / Creator) ── */
+    .example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 28px; }
+    @media(max-width:600px){ .example-grid { grid-template-columns: 1fr; } }
+    .example-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 20px 18px;
+      position: relative; overflow: hidden;
+    }
+    .example-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .ec-dev::before     { background: #22c88a; }
+    .ec-creator::before { background: #b86ef0; }
+    .ec-badge {
+      display: inline-block; margin-bottom: 10px;
+      padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .badge-dev     { background: #d8f4ea; color: #145c36; }
+    .badge-creator { background: #eeddff; color: #5a0ea0; }
+    .example-card h4 { font-size: 14px; font-weight: 700; color: #0a2a5e; margin-bottom: 6px; }
+    .example-card p  { font-size: 13px; color: #2d3748; margin: 0; line-height: 1.6; }
+    .skill-trigger {
+      font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+      color: #c05000; margin-top: 8px; background: #fff8f0;
+      border-radius: 4px; padding: 3px 8px; display: inline-block;
+    }
+
+    /* ── Step Chain (How to create) ── */
+    .step-chain {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 8px 0; margin: 20px 0 28px;
+    }
+    .step-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 16px 22px; border-bottom: 1px solid #e2e8f0;
+    }
+    .step-row:last-child { border-bottom: none; }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #0d47a1; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+    .step-content h4 { font-size: 14px; font-weight: 700; color: #0a2a5e; margin-bottom: 4px; }
+    .step-content p  { font-size: 13.5px; color: #2d3748; margin: 0; }
+    .step-code {
+      font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+      color: #276749; margin-top: 6px; background: #f0faf4;
+      border-radius: 4px; padding: 3px 8px; display: inline-block;
+      border: 1px solid #c6f0d8;
+    }
+
+    /* ── Comparison Table ── */
+    .table-wrap { overflow-x: auto; margin: 20px 0 28px; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: #0d47a1; color: #fff; }
+    thead th { padding: 12px 16px; text-align: left; font-weight: 700; font-size: 13px; }
+    tbody tr:nth-child(even) { background: #f7f9fc; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody tr:hover { background: #eef2fb; }
+    td { padding: 11px 16px; color: #2d3748; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-size: 13.5px; }
+    td:first-child { font-weight: 600; color: #1a365d; font-size: 14px; }
+
+    .badge-inline {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 11.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    }
+    .bi-green  { background: #d8f4ea; color: #145c36; }
+    .bi-blue   { background: #dceeff; color: #0a3580; }
+    .bi-purple { background: #eeddff; color: #5a0ea0; }
+    .bi-orange { background: #fde8d8; color: #8b3a10; }
+    .bi-yellow { background: #fef9c3; color: #7a5c00; }
+
+    /* ── Best Practices ── */
+    .bp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 28px; }
+    @media(max-width:600px){ .bp-grid { grid-template-columns: 1fr; } }
+    .bp-card {
+      background: #f7f9fc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 18px 16px;
+    }
+    .bp-number { font-size: 28px; font-weight: 800; color: #e2e8f0; line-height: 1; margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+    .bp-card h3 { font-size: 13.5px; font-weight: 700; color: #0a2a5e; margin-bottom: 5px; }
+    .bp-card p  { font-size: 13px; color: #2d3748; margin: 0; line-height: 1.6; }
+
+    /* ── Accordion ── */
+    .accordion { margin: 20px 0; }
+    .acc-item  { border-bottom: 1px solid #e2e8f0; }
+    .acc-trigger {
+      width: 100%; background: none; border: none;
+      padding: 14px 0; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14.5px;
+      font-weight: 600; color: #0a2a5e; text-align: left;
+    }
+    .acc-trigger:hover { color: #0d47a1; }
+    .acc-icon { font-size: 18px; color: #4a5568; transition: transform .25s; flex-shrink: 0; margin-left: 12px; }
+    .acc-item.open .acc-icon { transform: rotate(45deg); color: #0d47a1; }
+    .acc-body { display: none; padding-bottom: 14px; font-size: 14px; color: #2d3748; line-height: 1.7; }
+    .acc-item.open .acc-body { display: block; }
+
+    /* ── CTA ── */
+    .cta {
+      background: linear-gradient(135deg, #0a2a5e, #1a6b3c);
+      border-radius: 12px; padding: 32px 30px; color: #fff;
+      margin-top: 48px; text-align: center;
+    }
+    .cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .cta p  { font-size: 14.5px; opacity: 0.9; margin: 0; color: #fff; }
+
+    /* ── Tags ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+    .tag  { background: #e8eef8; color: #0a2a5e; border-radius: 20px; font-size: 12.5px; font-weight: 600; padding: 4px 14px; }
+
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 36px 0; }
+
+    a { color: #0d47a1; text-decoration: none; border-bottom: 1px solid #b3c7e8; transition: color .15s; }
+    a:hover { color: #512da8; border-color: #9c6fda; }
+
+    @media(max-width:600px){
+      .hero, .body { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">AI TOOLING · DEVELOPER PRODUCTIVITY</div>
+    <h1>Stop Repeating Yourself to Your AI — Teach It Once, Use It Everywhere 🧠</h1>
+    <p class="hero-sub">Skills are the missing layer between raw AI power and daily productivity. Here's how developers and creators are using them to turn AI tools into genuinely personal assistants — across Claude, Cursor, Claude Code, and beyond.</p>
+    <div class="hero-meta">
+      <span>April 2026</span>
+      <span>⏱ 9 min read</span>
+      <span>✍️ Utkarsh Swarnkar</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p>Every developer has done it. You open a new chat with your AI assistant and type: <em>"You are a senior backend engineer, we use TypeScript, Postgres, and our error handling follows this pattern..."</em> — for the fourteenth time this week. Same context. Same conventions. Same frustration.</p>
+
+    <p>There's a better abstraction. It's called a <strong>Skill</strong> — a reusable, persistent block of structured knowledge that lives alongside your AI tool and activates automatically when relevant. Think of it like a config file for your AI's brain. Write it once, trigger it everywhere.</p>
+
+    <p>Skills aren't just for developers. A content creator who writes in a specific tone, a technical writer who follows a documentation standard, a designer who has preferred component patterns — all of them are spending time re-teaching context that should be stored, not re-typed.</p>
+
+    <div class="callout">
+      <p>💡 <strong>The core idea</strong> — A Skill is a Markdown file with a YAML header that tells your AI tool what it knows, when to use it, and exactly how to apply it. The model reads the skill when relevant and executes accordingly. You stop explaining. It starts knowing.</p>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section-title"><span class="emoji">⚙️</span> How Skills Work — The Mental Model</div>
+
+    <p>AI tools like Claude Code and Cursor already know how to read files, write code, and follow instructions. Skills extend that by giving the model a <strong>persistent, queryable library of domain knowledge</strong>. When you say "write a migration" or "draft a blog post," the tool checks its skill index, pulls the relevant knowledge, and applies it — without you saying another word.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-title">// Skill Activation Flow</div>
+      <div class="flow-row">
+        <div class="flow-box fb-green">USER PROMPT</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-yellow">⚡ SKILL INDEX</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-grey">DESCRIPTION MATCH?</div>
+      </div>
+      <div class="fb-arrow" style="text-align:center; display:block; margin: 4px 0;">↓</div>
+      <div class="flow-row">
+        <div class="flow-box fb-blue">READ SKILL.md</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-purple">LOAD REFERENCES</div>
+        <div class="fb-arrow">→</div>
+        <div class="flow-box fb-orange">EXECUTE TASK</div>
+      </div>
+      <div style="margin-top: 20px;">
+        <div class="anatomy-block">
+          <div class="anatomy-label" style="color:#50dca0">skill-name/SKILL.md</div>
+          <div class="anatomy-line"><span class="key">---</span></div>
+          <div class="anatomy-line"><span class="key">name:</span> <span class="str">docx-generator</span></div>
+          <div class="anatomy-line"><span class="key">description:</span> <span class="str">Use when creating Word documents, reports...</span> <span class="cmt"># ← triggering text</span></div>
+          <div class="anatomy-line"><span class="key">---</span></div>
+          <div class="anatomy-line"><span class="cmt"># Instructions, patterns, examples, constraints go here</span></div>
+          <div class="anatomy-line"><span class="kw">## Output Format</span></div>
+          <div class="anatomy-line"><span class="val">Always use python-docx. Heading styles map to...</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHERE SKILLS LIVE -->
+    <div class="section-title"><span class="emoji">🛠️</span> Where Skills Live Today — The Ecosystem</div>
+
+    <p>Skills aren't a single company's invention. The pattern has emerged independently across the best AI-native tools in 2026. Each implements it slightly differently, but the core concept — <strong>a named, described, reusable knowledge block</strong> — is the same everywhere.</p>
+
+    <div class="tool-grid">
+      <div class="tool-card tc-claude">
+        <div class="tool-icon">🤖</div>
+        <div class="tool-name">Claude (claude.ai)</div>
+        <div class="tool-type">Web · Mobile · API</div>
+        <p class="tool-desc">Claude supports installable <code>.skill</code> files via the Skills settings panel. Stored as SKILL.md in a folder, bundled with optional reference files. Claude reads the description to decide when to activate a skill — no explicit invocation needed.</p>
+        <ul class="tool-list">
+          <li>Trigger: natural language description in frontmatter</li>
+          <li>Scope: per-user, persists across all conversations</li>
+          <li>Bundled assets: references/, scripts/, assets/</li>
+          <li>Install via: Settings → Skills → Upload .skill file</li>
+        </ul>
+      </div>
+      <div class="tool-card tc-code">
+        <div class="tool-icon">💻</div>
+        <div class="tool-name">Claude Code</div>
+        <div class="tool-type">CLI · Agentic Coding</div>
+        <p class="tool-desc">Claude Code reads skills from <code>/mnt/skills/</code> at runtime during agentic tasks. Particularly powerful for multi-step tasks — Claude checks which skill applies, loads the right reference, and executes without stopping to ask.</p>
+        <ul class="tool-list">
+          <li>Trigger: description match at task planning time</li>
+          <li>Scope: project-local or user-global</li>
+          <li>Perfect for: docx, pptx, xlsx generation workflows</li>
+          <li>Scripts in skills/ run directly in the container</li>
+        </ul>
+      </div>
+      <div class="tool-card tc-cursor">
+        <div class="tool-icon">🖱️</div>
+        <div class="tool-name">Cursor</div>
+        <div class="tool-type">IDE · AI-Native Editor</div>
+        <p class="tool-desc">Cursor uses <strong>Rules</strong> (formerly .cursorrules) as its skill equivalent. Stored in <code>.cursor/rules/</code>, these are Markdown files with frontmatter describing when they apply. Cursor activates them per-file, per-task, or always.</p>
+        <ul class="tool-list">
+          <li>Trigger: glob patterns (e.g., <code>**/*.tsx</code>) or "always"</li>
+          <li>Scope: project-level, committed to git</li>
+          <li>Great for: coding conventions, test patterns, PR formats</li>
+          <li>Team-shareable — lives in the repo</li>
+        </ul>
+      </div>
+      <div class="tool-card tc-continue">
+        <div class="tool-icon">⚡</div>
+        <div class="tool-name">Continue.dev</div>
+        <div class="tool-type">IDE Plugin · Open Source</div>
+        <p class="tool-desc">Continue uses <strong>Context Providers</strong> and <strong>Slash Commands</strong> as skill primitives. You define reusable prompts and context injections in <code>.continue/config.json</code>. Activate them with <code>/skillname</code> in the chat.</p>
+        <ul class="tool-list">
+          <li>Trigger: explicit slash command invocation</li>
+          <li>Scope: project or global config</li>
+          <li>Supports: file context, docs, terminal output injection</li>
+          <li>Fully open source and self-hostable</li>
+        </ul>
+      </div>
+      <div class="tool-card tc-aider">
+        <div class="tool-icon">🔧</div>
+        <div class="tool-name">Aider</div>
+        <div class="tool-type">CLI · Git-Integrated</div>
+        <p class="tool-desc">Aider's equivalent is <code>CONVENTIONS.md</code> or <code>.aider.conf.yml</code> — a persistent instructions file that's automatically sent with every session. Less structured than skills, but the same idea: teach it your patterns once.</p>
+        <ul class="tool-list">
+          <li>Trigger: always injected into every session</li>
+          <li>Scope: project-level, git-committed</li>
+          <li>Best for: commit message format, refactor patterns</li>
+          <li>Combine with <code>--read</code> flag for selective loading</li>
+        </ul>
+      </div>
+      <div class="tool-card tc-copilot">
+        <div class="tool-icon">🐙</div>
+        <div class="tool-name">GitHub Copilot</div>
+        <div class="tool-type">IDE Plugin · Enterprise</div>
+        <p class="tool-desc">Copilot's <strong>Custom Instructions</strong> (Copilot Workspace + VS Code extension) let you define persistent context in <code>.github/copilot-instructions.md</code>. Applied to all Copilot Chat interactions within the repo.</p>
+        <ul class="tool-list">
+          <li>Trigger: always active for the repo</li>
+          <li>Scope: repository-level</li>
+          <li>Best for: tech stack context, naming conventions</li>
+          <li>Enterprise: org-level instructions available</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- REAL EXAMPLES -->
+    <div class="section-title"><span class="emoji">🎯</span> Real Examples — Developers & Content Creators</div>
+
+    <p>The best way to understand skills is to see them in action. Here's how different people use them to eliminate repetitive context and unlock genuinely personalized AI output.</p>
+
+    <div class="example-grid">
+      <div class="example-card ec-dev">
+        <div class="ec-badge badge-dev">Developer</div>
+        <h4>Database Migration Patterns</h4>
+        <p>A backend engineer at a fintech stores their exact migration conventions — Flyway naming scheme, rollback requirements, index strategy, audit column defaults. Now every "write a migration for X" follows the house standard automatically.</p>
+        <div class="skill-trigger">triggers: "migration", "schema change", "ALTER TABLE"</div>
+      </div>
+      <div class="example-card ec-dev">
+        <div class="ec-badge badge-dev">Developer</div>
+        <h4>API Error Handling</h4>
+        <p>A TypeScript team defines their error hierarchy, HTTP status mapping, and logging format in a skill. Claude Code produces controllers that match the codebase's existing error patterns — no more "wrap this in a try-catch our way" in every prompt.</p>
+        <div class="skill-trigger">triggers: "API endpoint", "controller", "error handling"</div>
+      </div>
+      <div class="example-card ec-dev">
+        <div class="ec-badge badge-dev">Developer</div>
+        <h4>PR Description Generator</h4>
+        <p>A Cursor rule fires on every "write my PR description" request. It knows the team's Jira ticket format, the required sections (Summary, Testing Notes, Breaking Changes), and the tone. PR reviews got faster. Reviewers stopped complaining.</p>
+        <div class="skill-trigger">triggers: "PR description", "pull request", "changelog"</div>
+      </div>
+      <div class="example-card ec-dev">
+        <div class="ec-badge badge-dev">Developer</div>
+        <h4>Terraform Module Scaffolding</h4>
+        <p>A DevOps engineer stores their org's module structure, variable naming conventions, tagging strategy, and remote backend config. Asking Claude Code to "create a new VPC module" produces a production-ready scaffold on the first try.</p>
+        <div class="skill-trigger">triggers: "terraform", "module", "infrastructure"</div>
+      </div>
+      <div class="example-card ec-creator">
+        <div class="ec-badge badge-creator">Content Creator</div>
+        <h4>Personal HTML Article Style</h4>
+        <p>A technical writer stores their complete HTML visual identity — color palette, font choices, component patterns, document structure — as a skill. Every article looks like it came from the same design system, written in minutes not hours.</p>
+        <div class="skill-trigger">triggers: "write html", "html article", "html style"</div>
+      </div>
+      <div class="example-card ec-creator">
+        <div class="ec-badge badge-creator">Content Creator</div>
+        <h4>LinkedIn Post Voice</h4>
+        <p>A developer-turned-creator stores their writing style: punchy openers, no corporate jargon, always ends with a question, uses short one-line paragraphs. Claude drafts posts that actually sound like them — not like a press release.</p>
+        <div class="skill-trigger">triggers: "LinkedIn post", "social post", "write a post"</div>
+      </div>
+      <div class="example-card ec-creator">
+        <div class="ec-badge badge-creator">Content Creator</div>
+        <h4>Documentation Templates</h4>
+        <p>A technical writer stores the exact doc structure their team uses: admonition styles, code snippet formatting, cross-reference patterns, glossary standards. New docs are structurally correct from line one.</p>
+        <div class="skill-trigger">triggers: "write docs", "documentation", "README"</div>
+      </div>
+      <div class="example-card ec-creator">
+        <div class="ec-badge badge-creator">Content Creator</div>
+        <h4>Newsletter Section Templates</h4>
+        <p>A developer newsletter author stores section headers, intro formats, sponsor callout patterns, and their signature "this week in" item structure. Each issue maintains the same reading rhythm their 12k subscribers expect.</p>
+        <div class="skill-trigger">triggers: "newsletter", "weekly digest", "issue #"</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- COMPARISON TABLE -->
+    <div class="section-title"><span class="emoji">📊</span> Skills Across Tools — Feature Comparison</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Skill Format</th>
+            <th>Trigger Mechanism</th>
+            <th>Scope</th>
+            <th>Team-Shareable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Claude (claude.ai)</td>
+            <td><span class="badge-inline bi-orange">.skill file</span></td>
+            <td>Description match (auto)</td>
+            <td>User-global</td>
+            <td>Via export/import</td>
+          </tr>
+          <tr>
+            <td>Claude Code</td>
+            <td><span class="badge-inline bi-orange">SKILL.md folder</span></td>
+            <td>Description match (auto)</td>
+            <td>Project or global</td>
+            <td>Committed to repo</td>
+          </tr>
+          <tr>
+            <td>Cursor</td>
+            <td><span class="badge-inline bi-blue">.mdc Rules file</span></td>
+            <td>Glob pattern / always</td>
+            <td>Project-level</td>
+            <td>✅ Yes, via git</td>
+          </tr>
+          <tr>
+            <td>Continue.dev</td>
+            <td><span class="badge-inline bi-green">config.json</span></td>
+            <td>Slash command (explicit)</td>
+            <td>Project or global</td>
+            <td>✅ Yes, via git</td>
+          </tr>
+          <tr>
+            <td>Aider</td>
+            <td><span class="badge-inline bi-yellow">CONVENTIONS.md</span></td>
+            <td>Always injected</td>
+            <td>Project-level</td>
+            <td>✅ Yes, via git</td>
+          </tr>
+          <tr>
+            <td>GitHub Copilot</td>
+            <td><span class="badge-inline bi-purple">copilot-instructions.md</span></td>
+            <td>Always active (repo)</td>
+            <td>Repository-level</td>
+            <td>✅ Yes, via git</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ANATOMY OF A SKILL -->
+    <div class="section-title"><span class="emoji">🔬</span> Anatomy of a Skill — What Lives Inside</div>
+
+    <p>A skill is a directory with one required file and optional support files. The directory name becomes the skill name. The structure follows a <strong>progressive disclosure</strong> principle — only what's needed gets loaded into context.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-title">// Skill Directory Structure</div>
+      <div class="anatomy-block">
+        <div class="anatomy-label" style="color:#f0c040">skill-name/</div>
+        <div class="anatomy-line"><span class="str">├── SKILL.md</span>         <span class="cmt">← required: instructions + YAML frontmatter</span></div>
+        <div class="anatomy-line"><span class="val">├── references/</span>      <span class="cmt">← optional: docs, standards, lookup tables</span></div>
+        <div class="anatomy-line"><span class="val">│   ├── patterns.md</span></div>
+        <div class="anatomy-line"><span class="val">│   └── examples.md</span></div>
+        <div class="anatomy-line"><span class="val">├── scripts/</span>          <span class="cmt">← optional: executable helpers (Python, bash)</span></div>
+        <div class="anatomy-line"><span class="val">│   └── generate.py</span></div>
+        <div class="anatomy-line"><span class="val">└── assets/</span>           <span class="cmt">← optional: templates, fonts, icons</span></div>
+        <div class="anatomy-line"><span class="val">    └── template.docx</span></div>
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="anatomy-block">
+          <div class="anatomy-label" style="color:#50dca0">SKILL.md — Frontmatter</div>
+          <div class="anatomy-line"><span class="key">---</span></div>
+          <div class="anatomy-line"><span class="key">name:</span>          <span class="str">my-skill-name</span>               <span class="cmt"># identifier</span></div>
+          <div class="anatomy-line"><span class="key">description:</span>   <span class="str">Use when user asks for X...</span>   <span class="cmt"># THIS IS THE TRIGGER</span></div>
+          <div class="anatomy-line"><span class="key">compatibility:</span> <span class="str">requires python3, pandoc</span>     <span class="cmt"># optional deps</span></div>
+          <div class="anatomy-line"><span class="key">---</span></div>
+          <div class="anatomy-line"></div>
+          <div class="anatomy-line"><span class="kw"># Skill Title</span></div>
+          <div class="anatomy-line"><span class="val">Clear instructions for how to use this skill.</span></div>
+          <div class="anatomy-line"><span class="val">Reference files with `view /path/to/reference.md`.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p>The <strong>description</strong> field is the most important line you'll write. It's what the model reads to decide whether this skill applies to the current task. Write it like you're explaining to a junior dev when to open this playbook — specific, with example triggers included.</p>
+
+    <div class="callout callout-warn">
+      <p>⚠️ <strong>Description is the triggering mechanism</strong> — if your skill isn't activating, the description is almost always why. Be explicit. Include concrete phrases the user might say. "Use when creating Word documents, .docx files, reports, or professional formatted documents" beats "Use for documents."</p>
+    </div>
+
+    <!-- HOW TO CREATE -->
+    <div class="section-title"><span class="emoji">🚀</span> How to Create and Store a Skill</div>
+
+    <p>Creating a skill takes about 10 minutes the first time. After that, you'll wish you'd done it for everything you repeat more than twice. Here's the exact workflow:</p>
+
+    <div class="step-chain">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Identify What You Repeat</h4>
+          <p>Every time you paste the same context, add the same constraints, or re-explain the same patterns to your AI — that's skill material. The 2-minute rule: if you've explained something more than twice, write a skill for it.</p>
+          <div class="step-code">signals: repeated context · same output format · specific conventions</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Create the Directory and SKILL.md</h4>
+          <p>Make a folder named after your skill. Inside it, create <code>SKILL.md</code>. Start with the YAML frontmatter: name and description. Then write the instructions — what the model should know, how it should behave, what it should produce.</p>
+          <div class="step-code">mkdir my-skill && touch my-skill/SKILL.md</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Write a Sharp Description</h4>
+          <p>This is your skill's activation trigger. Be specific. Include example user phrases. Mention the output format. Tell the model when <em>not</em> to use it. A good description is 2–4 sentences — not a word, not a paragraph.</p>
+          <div class="step-code">description: Use when user asks to create X, Y, Z. Triggers on phrases like "write a..."</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Add Reference Files for Large Knowledge</h4>
+          <p>If your instructions would exceed ~500 lines, break them into reference files in a <code>references/</code> folder. Point to them from SKILL.md with instructions on when to load each one. This keeps the main file fast and focused.</p>
+          <div class="step-code">references/aws.md · references/gcp.md · references/azure.md</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Package and Install</h4>
+          <p>For Claude.ai, zip your skill folder into a <code>.skill</code> file and install via Settings → Skills. For Cursor, drop your <code>.mdc</code> file into <code>.cursor/rules/</code>. For Claude Code, place the folder under <code>/mnt/skills/user/</code>.</p>
+          <div class="step-code">zip -r my-skill.skill my-skill/ → upload to Claude Settings</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Test and Iterate</h4>
+          <p>Try your trigger phrase. If the skill doesn't activate, sharpen the description. If the output is off, update the instructions. Skills improve fast because the feedback loop is immediate — you see the output in seconds.</p>
+          <div class="step-code">say the trigger phrase → check output → update SKILL.md → repeat</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- FAQ -->
+    <div class="section-title"><span class="emoji">❓</span> Common Questions</div>
+
+    <div class="accordion">
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">How is a skill different from a system prompt? <span class="acc-icon">+</span></button>
+        <div class="acc-body">A system prompt is always-on, injected into every conversation. A skill is conditional — it only loads when relevant based on the task description. This makes skills far more efficient. You can have 20 skills installed without any of them bloating the context for unrelated tasks. System prompts are blunt instruments; skills are surgical.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">Can I share skills with my team? <span class="acc-icon">+</span></button>
+        <div class="acc-body">Yes — and this is one of the most underused patterns. In Claude Code and Cursor, skills live as files in your project, so they commit to git and travel with the codebase. Every team member automatically gets the same knowledge. For Claude.ai, you export a .skill file and share it like you'd share a config. A team that shares skills stops drifting in different AI directions.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">What goes in references/ vs SKILL.md? <span class="acc-icon">+</span></button>
+        <div class="acc-body">SKILL.md should be your "always need this" knowledge — the workflow, the output format, the core rules. Under 500 lines ideally. References/ is for lookup material that's only needed sometimes — a full API schema, a large example library, a brand style guide with hundreds of rules. The model loads references on demand, not always, keeping base context light.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">My skill isn't triggering. What's wrong? <span class="acc-icon">+</span></button>
+        <div class="acc-body">Almost always it's the description. The model reads descriptions to decide relevance — it's not keyword matching, it's semantic reasoning. If your description is too generic ("use for documents"), add more specificity. Include the exact phrases a user would say. Mention the output format, the file type, the context. Also make sure your skill doesn't overlap confusingly with another installed skill.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">Should I version my skills? <span class="acc-icon">+</span></button>
+        <div class="acc-body">If your skills are in a git repo (Cursor, Claude Code, Aider), versioning is free — you get full history automatically. For Claude.ai skills, manually export a dated backup before making major changes. Skills encoding something volatile (like model-specific behavior or rapidly changing APIs) benefit from a CHANGELOG section inside SKILL.md itself, so future you remembers why a rule exists.</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- BEST PRACTICES -->
+    <div class="section-title"><span class="emoji">✅</span> Best Practices for Writing Great Skills</div>
+
+    <div class="bp-grid">
+      <div class="bp-card">
+        <div class="bp-number">01</div>
+        <h3>One Skill, One Job</h3>
+        <p>Don't build a "general coding" skill. Build a "TypeScript React component" skill, a "SQL migration" skill, a "test file" skill. Narrower scope = better triggering, better output, easier maintenance.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">02</div>
+        <h3>Description is Everything</h3>
+        <p>Spend 30% of your time on the description. Include 5–8 example trigger phrases. Mention what the skill produces. The model uses this field to decide — treat it like an index card, not a label.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">03</div>
+        <h3>Show, Don't Just Tell</h3>
+        <p>Include one concrete before/after example in your SKILL.md. "Input: user says X. Output: looks like Y." Examples outperform abstract instructions in almost every task type. The model learns from patterns.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">04</div>
+        <h3>Keep SKILL.md Under 500 Lines</h3>
+        <p>If you're approaching 500 lines, you have a knowledge management problem, not an instruction problem. Break large context into references/ files and point to them conditionally from the main file.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">05</div>
+        <h3>Commit Skills to Git</h3>
+        <p>If your tool supports it, put skills in the repo. They're knowledge — they should be versioned, reviewed, and shared like code. A PR that adds a new skill is a gift to every teammate who uses AI on the project.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">06</div>
+        <h3>Write a "When NOT to Use" Section</h3>
+        <p>Explicitly stating when the skill does NOT apply prevents over-triggering. "Don't use this for Google Docs or HTML output" saves you from skills colliding in weird ways when you have a large library installed.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">07</div>
+        <h3>Include Scripts for Deterministic Work</h3>
+        <p>For any output that's structurally exact — generating a specific file format, running a transformation — put a script in scripts/ and have the skill run it. Code is more reliable than prose instructions for machine-precise output.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">08</div>
+        <h3>Review Skills Quarterly</h3>
+        <p>Technology moves fast. A skill written for a library pattern that got deprecated is now actively harmful. Add a <!-- reviewed: YYYY-MM --> comment at the top of SKILL.md and schedule a 15-minute review every quarter.</p>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3>The best AI tool is the one that already knows you. 🧠</h3>
+      <p>Stop re-explaining yourself. Write one skill per pattern you repeat, install it, and let your AI tool do the remembering. An afternoon of skill-writing will save you hours every single week.</p>
+    </div>
+
+    <div class="tags">
+      <span class="tag">#AISkills</span>
+      <span class="tag">#ClaudeCode</span>
+      <span class="tag">#CursorRules</span>
+      <span class="tag">#DeveloperProductivity</span>
+      <span class="tag">#AITooling</span>
+      <span class="tag">#PromptEngineering</span>
+      <span class="tag">#ContentCreation</span>
+      <span class="tag">#AIWorkflow</span>
+      <span class="tag">#Claude</span>
+      <span class="tag">#SoftwareEngineering</span>
+      <span class="tag">#MLOps</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function toggleAcc(btn) { btn.closest('.acc-item').classList.toggle('open'); }
+</script>
+</body>
+</html>
