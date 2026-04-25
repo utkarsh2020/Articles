@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The AI Architect: The Role Most Orgs Are Getting Wrong</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#f3f2ef;color:#1d2226;line-height:1.75;font-size:15.5px;}
+a{color:#0d47a1;text-decoration:none;border-bottom:1px solid #b3c7e8;transition:color .15s;}
+a:hover{color:#512da8;border-color:#9c6fda;}
+.page-wrapper{max-width:860px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);}
+
+.hero{background:linear-gradient(135deg,#0a2a5e 0%,#0d47a1 45%,#1a6b3c 100%);padding:56px 48px 44px;color:#fff;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,0.06);}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.hero-tag{display:inline-block;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:4px 14px;margin-bottom:20px;}
+.hero h1{font-size:30px;font-weight:800;line-height:1.25;margin-bottom:14px;position:relative;z-index:1;max-width:700px;}
+.hero-sub{font-size:16px;opacity:0.9;max-width:580px;margin-bottom:22px;position:relative;z-index:1;}
+.hero-meta{display:flex;gap:20px;font-size:13px;opacity:0.75;flex-wrap:wrap;}
+
+.body{padding:48px 48px 56px;}
+p{margin-bottom:16px;color:#2d3748;}
+p strong{color:#0a2a5e;}
+hr.divider{border:none;border-top:1px solid #e2e8f0;margin:36px 0;}
+
+.section-title{font-size:22px;font-weight:800;color:#0a2a5e;margin:48px 0 14px;padding-bottom:10px;border-bottom:3px solid #e3eaf6;display:flex;align-items:center;gap:10px;}
+
+.callout{border-left:4px solid #0d47a1;background:#eef2fb;border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0;}
+.callout p{margin:0;font-size:14.5px;color:#1a365d;}
+.callout-warn{border-left-color:#c05000;background:#fff8f0;}
+.callout-warn p{color:#7a3000;}
+
+.flow-diagram{background:#0d1117;border-radius:10px;padding:28px 24px;margin:20px 0 28px;overflow-x:auto;}
+.flow-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.flow-box{padding:7px 16px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;border:1px solid;white-space:nowrap;}
+.fb-green{background:rgba(80,220,160,.15);border-color:#50dca0;color:#50dca0;}
+.fb-blue{background:rgba(80,160,255,.15);border-color:#60a0ff;color:#60a0ff;}
+.fb-yellow{background:rgba(255,200,50,.12);border-color:#f0c040;color:#f0c040;}
+.fb-red{background:rgba(255,100,100,.12);border-color:#ff6464;color:#ff6464;}
+.fb-grey{background:rgba(160,160,180,.10);border-color:#888;color:#aaa;}
+.flow-arrow{color:#4a5568;font-size:18px;flex-shrink:0;}
+.flow-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:#556;margin-bottom:8px;}
+
+.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.card{background:#f7f9fc;border:1px solid #e2e8f0;border-radius:10px;padding:20px 18px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#0d47a1;}
+.card.green::before{background:#1a6b3c;}
+.card.orange::before{background:#c05000;}
+.card.purple::before{background:#512da8;}
+.card.teal::before{background:#0694a2;}
+.card.gold::before{background:#b7791f;}
+.card h3{font-size:14px;font-weight:700;color:#0a2a5e;margin-bottom:6px;}
+.card p{font-size:13px;color:#2d3748;margin:0;line-height:1.6;}
+.card .badge{margin-bottom:8px;display:block;}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.b-blue{background:#d8e6fb;color:#1a3a7a;}
+.b-green{background:#d8f4ea;color:#145c36;}
+.b-orange{background:#fde8d8;color:#8b3a10;}
+.b-purple{background:#ede9fb;color:#3b1a7a;}
+
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;margin-top:16px;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#0d47a1;color:#fff;}
+thead th{padding:12px 16px;font-weight:700;font-size:13px;text-align:left;}
+tbody tr:nth-child(even){background:#f7f9fc;}
+tbody tr:nth-child(odd){background:#fff;}
+tbody tr:hover{background:#eef2fb;}
+td{padding:11px 16px;color:#2d3748;border-bottom:1px solid #e2e8f0;font-size:13.5px;}
+td:first-child{font-weight:600;color:#1a365d;font-size:14px;}
+
+.step-chain{margin-top:16px;}
+.step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+.step-num{min-width:36px;height:36px;background:#0d47a1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;margin-top:2px;}
+.step-content h3{font-size:15px;font-weight:700;color:#0a2a5e;margin-bottom:4px;}
+.step-content p{font-size:13.5px;color:#2d3748;margin:0;line-height:1.6;}
+
+.acc-list{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-top:16px;}
+.acc-item{border-bottom:1px solid #e2e8f0;}
+.acc-item:last-child{border-bottom:none;}
+.acc-trigger{width:100%;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:600;color:#0a2a5e;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;text-align:left;}
+.acc-trigger:hover{color:#0d47a1;background:#f7f9fc;}
+.acc-icon{font-size:18px;color:#4a5568;transition:transform .25s;flex-shrink:0;}
+.acc-item.open .acc-icon{transform:rotate(45deg);color:#0d47a1;}
+.acc-body{display:none;font-size:14px;color:#2d3748;line-height:1.7;padding:0 20px 16px;}
+.acc-item.open .acc-body{display:block;}
+
+.bp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.bp-card{background:#f7f9fc;border:1px solid #e2e8f0;border-radius:10px;padding:20px 18px;}
+.bp-number{font-size:28px;font-weight:800;color:#e2e8f0;line-height:1;margin-bottom:6px;}
+.bp-card h3{font-size:13.5px;font-weight:700;color:#0a2a5e;margin-bottom:5px;}
+.bp-card p{font-size:13px;color:#2d3748;margin:0;line-height:1.6;}
+
+.cta{background:linear-gradient(135deg,#0a2a5e,#1a6b3c);border-radius:12px;padding:32px 30px;color:#fff;margin-top:48px;text-align:center;}
+.cta h3{font-size:20px;font-weight:800;margin-bottom:10px;}
+.cta p{font-size:14.5px;opacity:0.9;color:#fff;margin:0;}
+
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px;}
+.tag{background:#e8eef8;color:#0a2a5e;border-radius:20px;font-size:12.5px;font-weight:600;padding:4px 14px;}
+
+@media(max-width:600px){
+  .hero,.body{padding:32px 24px;}
+  .two-col-grid,.bp-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:23px;}
+  .flow-row{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <div class="hero">
+    <div class="hero-tag">AI STRATEGY · ORGANISATIONAL DESIGN</div>
+    <h1>The AI Architect: The Role Most Organisations Are Getting Wrong 🏗️</h1>
+    <p class="hero-sub">Most enterprise AI programmes are not failing because of the models. They are failing because nobody owns the decisions that compound quietly over months until the system becomes too fragile to fix without a rewrite.</p>
+    <div class="hero-meta">
+      <span>April 2025</span>
+      <span>⏱ 10 min read</span>
+      <span>✍️ Utkarsh Swarnkar</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <p>The pattern shows up across organisations at scale. Someone with a senior AI title, a polished deck, and a production system running on decisions nobody documented. The retrieval pipeline is returning stale results. The chunk size has been hardcoded since the prototype. Nobody knows who set it, or why. The demo still works fine.</p>
+
+    <p>That gap between demo and production is where most enterprise AI money quietly disappears. Not because the technology is wrong. Because the decisions that hold the technology together were never owned by anyone.</p>
+
+    <p>The AI Architect is the role that exists specifically to close that gap. Not to write all the code. Not to run every sprint. To be accountable for the decisions that are expensive to undo and make sure they get made deliberately instead of by default.</p>
+
+    <div class="callout">
+      <p>💡 <strong>The job in one sentence:</strong> The AI Architect owns the decisions that are hard to reverse, and ensures they were actually thought through before the organisation committed to them.</p>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>🔭</span> What the Role Actually Looks Like in Practice</div>
+
+    <p>This role does not have a clean day. A morning might involve reviewing a model evaluation report, pivoting to a conversation with legal about data residency, and ending with a junior engineer asking why their agent is stuck in a loop. All of it is the job.</p>
+
+    <p>The AI Architect operates across four distinct planes simultaneously. Most technical practitioners are fluent in one, occasionally two. This role demands all four, and more critically, the ability to translate between them without losing meaning at the handoff.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-label"># The Four Planes — and what quietly breaks when any one is left unowned</div>
+      <div class="flow-row">
+        <div class="flow-box fb-green">TECHNICAL</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Model selection · integration patterns · latency vs cost · infra topology</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-blue">ORGANISATIONAL</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Team ownership · AI literacy · cross-functional collaboration · shadow AI risk</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-yellow">GOVERNANCE</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Risk register · data residency · audit trails · responsible AI in practice</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-red">STRATEGIC</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Build vs buy · long bets · competitive moat · ROI accountability</div>
+      </div>
+    </div>
+
+    <p>The most common hiring failure: a brilliant engineer placed into this role who cannot communicate tradeoffs to the CFO. Or a sharp strategist hired in who later cannot explain why the summarisation pipeline was quietly hallucinating in a customer-facing product for weeks before someone flagged it.</p>
+
+    <div class="callout callout-warn">
+      <p>⚠️ <strong>The real tell:</strong> An AI Architect who has never personally debugged a retrieval failure, reviewed an eval report, or written a prompt that had to survive production load is a consultant in a technical costume. The vocabulary is not the expertise.</p>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>⚙️</span> Core Responsibilities: What the Job Actually Is</div>
+
+    <p>Not what the job description says. What the work actually requires.</p>
+
+    <div class="two-col-grid">
+      <div class="card">
+        <span class="badge b-blue">TECHNICAL LEADERSHIP</span>
+        <h3>AI System Design</h3>
+        <p>Owns end-to-end architecture for AI systems. The design, not just the implementation. API contracts, vector store strategy, agent orchestration topology, when to fine-tune vs prompt-engineer vs improve retrieval. The decisions that are expensive to revisit six months later.</p>
+      </div>
+      <div class="card green">
+        <span class="badge b-green">LIFECYCLE</span>
+        <h3>Model Lifecycle Management</h3>
+        <p>Defines how models get evaluated, promoted, monitored, and retired. GPT-5 will ship. Claude 4 will ship. The organisation without a migration story will panic. The one with a lifecycle framework will have a config change, a test run, and a quiet Monday.</p>
+      </div>
+      <div class="card orange">
+        <span class="badge b-orange">GOVERNANCE</span>
+        <h3>AI Risk and Compliance</h3>
+        <p>Owns the risk register. Maps data flows. Identifies PII exposure surfaces before a regulator does. Makes sure every AI system has an explainability story that holds under scrutiny, not just in a controlled demo environment where nothing goes sideways.</p>
+      </div>
+      <div class="card purple">
+        <span class="badge b-purple">ENABLEMENT</span>
+        <h3>Internal AI Platform</h3>
+        <p>Builds the shared infrastructure every team's AI work sits on. Eval harnesses, prompt registries, LLM observability, model gateways. The goal: doing things the safe, measurable way is also the path of least resistance. If it is not, teams will route around it. They always do.</p>
+      </div>
+      <div class="card teal">
+        <span class="badge b-blue">CODE QUALITY</span>
+        <h3>AI-Written Code Review Standards</h3>
+        <p>Defines how the organisation handles code written by Copilot, Cursor, Claude-in-IDE. Not a cultural nudge to "review it carefully." An actual tiered framework that specifies what level of scrutiny applies to what kind of code, so nobody is guessing and neither is the reviewer.</p>
+      </div>
+      <div class="card gold">
+        <span class="badge b-orange">INSTITUTIONAL MEMORY</span>
+        <h3>Architecture Decision Records</h3>
+        <p>Every significant AI design choice gets written down: the options considered, what was rejected and why, what was accepted at what cost. The document that prevents the same debate from running again every time someone new joins or a new framework drops.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>🧰</span> The Toolkit: What to Actually Reach For</div>
+
+    <p>The landscape is loud. Every week there is a new framework claiming to solve orchestration, RAG, or evaluation. The AI Architect's job is not to chase every release. It is to hold the map steady while the terrain shifts and know exactly what category of problem each class of tool exists to solve.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Decision Layer</th>
+            <th>Tools Worth Knowing</th>
+            <th>What It Decides</th>
+            <th>The Risk If Skipped</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Model Selection</td>
+            <td>LM Arena, OpenAI Evals, LlamaIndex benchmarks</td>
+            <td>Which foundation model anchors a use case</td>
+            <td>Vendor lock-in with no exit path</td>
+          </tr>
+          <tr>
+            <td>Orchestration</td>
+            <td>LangGraph, Semantic Kernel, AutoGen, CrewAI</td>
+            <td>How agents coordinate, call tools, hand off context</td>
+            <td>Invisible loops with nothing to debug against</td>
+          </tr>
+          <tr>
+            <td>RAG / Retrieval</td>
+            <td>Pinecone, Weaviate, pgvector, Azure AI Search</td>
+            <td>How context reaches the model reliably at scale</td>
+            <td>Retrieval drift nobody notices until a user does</td>
+          </tr>
+          <tr>
+            <td>Evaluation</td>
+            <td>RAGAS, DeepEval, Promptfoo, MLflow</td>
+            <td>Whether the system actually works outside of testing conditions</td>
+            <td>Confident, well-formatted wrong answers at scale</td>
+          </tr>
+          <tr>
+            <td>Observability</td>
+            <td>LangSmith, Helicone, Arize Phoenix, Grafana</td>
+            <td>What is actually happening in production right now</td>
+            <td>Silent degradation across weeks with no signal</td>
+          </tr>
+          <tr>
+            <td>Governance</td>
+            <td>Azure AI Foundry, Bedrock Guardrails, Guardrails AI</td>
+            <td>Policy enforcement at the model boundary</td>
+            <td>Drift between what the policy says and what ships</td>
+          </tr>
+          <tr>
+            <td>AI Code Review</td>
+            <td>CodeRabbit, Qodo, GitHub Copilot, Cursor</td>
+            <td>Quality gate for AI-generated code before it merges</td>
+            <td>Hallucinated logic dressed up in clean syntax</td>
+          </tr>
+          <tr>
+            <td>Cost Optimisation</td>
+            <td>LiteLLM, OpenRouter, model routing frameworks</td>
+            <td>Which model handles which request at what price point</td>
+            <td>A finance conversation nobody was prepared for</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p>💡 <strong>A useful rule of thumb:</strong> Every tool that enters the stack needs a named owner, a real exit path, and a metric that tells whether it is working. "We might use it later" is not a reason to add something. It is a reason to put it on a watchlist.</p>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>🔍</span> AI-Written Code Review: The Problem Nobody Wants to Say Out Loud</div>
+
+    <p>Teams using Copilot or Cursor are shipping faster. That part is real and well-documented. But production has also received PRs where the AI-generated function was logically coherent, syntactically clean, and factually wrong in a way that only surfaced six weeks later when a specific edge case hit at scale.</p>
+
+    <p>The problem is not that AI writes bad code. It is that AI writes <strong>confidently formatted bad code</strong> that sails through a casual review because it looks right. Standard review instincts catch style issues and obvious bugs. Neither catches a plausible but subtly incorrect algorithm wrapped in clean variable names.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-label"># The Four-Layer Review: apply by risk classification, not by instinct</div>
+      <div class="flow-row">
+        <div class="flow-box fb-blue">Layer 1: Static Analysis</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Ruff, ESLint, Semgrep — automated on every PR, no human required</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-green">Layer 2: Semantic Review</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">CodeRabbit / Qodo — AI reviewing AI, catching logic gaps, dead branches, inconsistencies</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-yellow">Layer 3: Human Spot-Check</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Senior engineer reviews AI-written modules above a complexity threshold (cyclomatic &gt; 8)</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box fb-red">Layer 4: Regression Eval</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box fb-grey">Automated test suite runs against AI-generated business logic before merge, no exceptions</div>
+      </div>
+    </div>
+
+    <p>The AI Architect defines which layer applies to which code class. A boilerplate data transformer does not need four layers. A module handling customer-facing contract calculations does. The classification policy is what makes this workable instead of just theoretically correct and practically ignored under deadline pressure.</p>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>📡</span> Long-Term Strategy: What Three Years Actually Requires</div>
+
+    <p>Most AI roadmaps are feature lists with "AI-powered" inserted before each item. That is not a strategy. A strategy is a set of deliberate bets: where the leverage is, what takes sustained time to build, and what the organisation is consciously leaving on the table.</p>
+
+    <div class="step-chain">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Build the Platform Before Building the Features (Year 1)</h3>
+          <p>Disconnected experiments compound into technical debt. Build the shared rails first: model gateway, eval harness, prompt registry, observability stack. Every team's AI work sits on these rails. The AI Architect defines them and makes adoption the path of least resistance, because if the platform is harder to use than rolling something custom, teams will roll something custom.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Turn Domain Knowledge Into a Defensible Asset (Years 1-2)</h3>
+          <p>Generic AI is a commodity. What an organisation knows about its domain, its customers, its processes, that is not a commodity. The AI Architect identifies which internal knowledge is a genuine proprietary asset and determines how to encode it into systems that compound over time, through fine-tuning, knowledge graphs, or structured retrieval strategies.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Design for Agents Before the Use Cases Arrive (Years 2-3)</h3>
+          <p>The shift from copilot-style assistance to autonomous multi-step agents is already underway and accelerating. The trust boundaries, escalation paths, and human-in-the-loop checkpoints for agentic workflows need to be designed before the pressure to ship them arrives, not retrofitted under that pressure. Getting the architecture wrong in year one typically means a full rewrite in year three.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Be Model-Agnostic by Architecture, Not by Declaration (Ongoing)</h3>
+          <p>The model any organisation is betting on today is probably not the best model in eighteen months. Every production system should sit behind an abstraction layer so that switching providers is a measured migration, not an emergency rewrite triggered by a deprecation notice or a competitive capability gap.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Measure in Business Terms, Not Just Engineering Terms (Ongoing)</h3>
+          <p>AI investments that cannot be expressed in language finance understands will get cut when budget pressure arrives. The measurement framework needs to cover productivity improvement, error rate reduction, cost per automated workflow, and time saved per process. Token counts and benchmark scores mean nothing in a quarterly review.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>📝</span> Design Decisions and Documentation: The Unglamorous Work That Holds Everything Together</div>
+
+    <p>No one gets promoted for writing good Architecture Decision Records. But organisations regularly spend months relitigating a vector store choice because nobody documented why it was selected in the first place, and most of the people from that original conversation have since moved on.</p>
+
+    <p>Documentation in AI is not a compliance ritual. It is how an organisation avoids repeating expensive mistakes. It is how a new engineer can understand why the system looks the way it does without needing to track down someone who was in the room two years ago.</p>
+
+    <div class="two-col-grid">
+      <div class="card">
+        <h3>What an ADR Actually Contains</h3>
+        <p>The problem being solved. The options considered, and why each one was set aside. The decision made and who owns it. The cost or risk accepted in making that choice. A date to revisit it. One page, honest, not a retrospective justification for a decision that was already made for other reasons.</p>
+      </div>
+      <div class="card green">
+        <h3>AI-Specific Docs Most Teams Skip</h3>
+        <p>Model cards for every model running in production. Prompt version logs with eval scores so there is evidence a prompt change actually helped. Data lineage maps tracing where training and retrieval data originates. Postmortems for every AI-related production incident, not only the ones visible on a public status page.</p>
+      </div>
+      <div class="card orange">
+        <h3>The Architecture Diagram That Stays Honest</h3>
+        <p>One source of truth showing how AI systems connect to each other, to data stores, and to downstream consumers. Updated within days of any meaningful change. Not the polished diagram that was accurate for a few weeks after it was created and has been quietly wrong ever since.</p>
+      </div>
+      <div class="card purple">
+        <h3>Governance Audit Trail</h3>
+        <p>Every AI system touching customer data needs a documented data flow, a retention policy, and a clear human review process for high-consequence outputs. The AI Architect defines the template and holds the standard. Walking into a regulatory audit with this prepared is a very different experience from assembling it under pressure after one is announced.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>🌍</span> What Actually Changes When This Role Exists</div>
+
+    <div class="callout">
+      <p>💡 The presence or absence of an AI Architect is visible in the architecture within six months. Without one: overlapping tools with no shared standard, no evaluation baseline, a compliance gap nobody is covering, and senior engineers spending half their time duct-taping systems together. With one: a coherent internal platform, traceable decisions, and a team that can absorb the next model release without a fire drill.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Without an AI Architect</th>
+            <th>With an AI Architect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tool Sprawl</td>
+            <td>Ten-plus overlapping tools, no shared standard, unclear what is actually in active use</td>
+            <td>Curated platform with golden paths and a documented reason for each choice</td>
+          </tr>
+          <tr>
+            <td>Model Governance</td>
+            <td>Ad hoc, undocumented, dependent on whoever last touched the system</td>
+            <td>Model cards, eval gates, lifecycle policy that survives team turnover</td>
+          </tr>
+          <tr>
+            <td>AI Code Quality</td>
+            <td>Depends entirely on individual reviewer intuition and available time</td>
+            <td>Tiered review framework applied consistently regardless of who is reviewing</td>
+          </tr>
+          <tr>
+            <td>Compliance Readiness</td>
+            <td>Scrambling when an audit or legal inquiry arrives</td>
+            <td>Audit trail maintained continuously, not assembled retroactively under pressure</td>
+          </tr>
+          <tr>
+            <td>Innovation Velocity</td>
+            <td>Fast starts, slow middles, painful endings</td>
+            <td>Measured starts, outcomes that persist past the sprint they shipped in</td>
+          </tr>
+          <tr>
+            <td>Cost Control</td>
+            <td>Inference spend surfaced during quarterly finance review</td>
+            <td>Cost-per-workflow tracked, model routing active, no unexpected spikes</td>
+          </tr>
+          <tr>
+            <td>Institutional Memory</td>
+            <td>Leaves with whoever exits next</td>
+            <td>Captured in ADRs, architecture docs, and postmortems the team references</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>❓</span> The Questions That Come Up in Every Hiring Conversation</div>
+
+    <div class="acc-list">
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          Can the CTO cover this role instead?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">In theory the scope overlaps. In practice it does not work. The CTO is governing technology direction across an entire organisation: board conversations, vendor negotiations, hiring pipelines. The AI Architect is deep in model evaluation cadences, prompt versioning, and risk registers. Both require sustained attention to execute properly. Once AI is no longer a side project, merging these roles means one of them does not get the attention it needs. In most cases, it is the AI work, because the CTO's calendar fills up with everything else first.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          What background actually works in this role?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">The profiles that tend to succeed have five to eight years in software or data engineering, at least two years working on production ML or LLM systems (not research), and demonstrated ability to communicate design decisions to non-technical stakeholders without losing the nuance. The clearest signal in an interview is whether the candidate can explain why they rejected something, not just what they chose. Advocacy for a tool is easy. Knowing what was turned down and articulating why is harder and rarer.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          How does this role work alongside data engineering?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">Data engineering owns the pipelines. The AI Architect owns the design decisions that determine what those pipelines need to produce. The collaboration needs to be close but with clear ownership boundaries. The failure mode in one direction: the AI Architect tries to own the pipelines too. In the other direction: data engineering is not looped in until the design is locked and unfeasible constraints surface late. Neither works. The relationship needs to start early and stay honest about what is and is not buildable.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          How do you make AI code review work without slowing delivery?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">Classification, not uniformity. Not every PR carries the same risk and should not carry the same review burden. A utility function formatting strings is a different category of risk from a module calculating customer-facing contract values. The AI Architect defines the matrix: code classification maps to review tier. Tools like CodeRabbit and Qodo handle the semantic layer automatically, preserving human review time for the code where it genuinely matters. Treating all AI-generated code identically, whether as equally safe or equally risky, is the mistake on both ends.</div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          What should concretely exist at the six-month mark?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">A published ADR registry with real decisions documented, not a template with placeholder text. An internal AI platform that at least three teams are actively using in production. A model evaluation framework being applied before features ship, not just cited in documentation. A risk register with at least one mitigation actively implemented and monitored. A three-year AI strategy that leadership has genuinely engaged with, argued about, and signed off on. If none of that is present at six months, the title exists but the role is not being executed.</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="section-title"><span>⭐</span> What Separates AI Architects Who Deliver from Those Who Just Sound Credible</div>
+
+    <div class="bp-grid">
+      <div class="bp-card">
+        <div class="bp-number">01</div>
+        <h3>Baseline Before Optimising</h3>
+        <p>A system that has not been measured cannot be improved and cannot be defended. Evaluation baselines before production is not a best practice to aspire to. It is the foundational step that makes every subsequent claim about improvement credible.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">02</div>
+        <h3>Every Production System Talks to an Abstraction</h3>
+        <p>Not directly to a model API. To a layer in front of it. Switching models should be a configuration change, not a rewrite. This is probably the architectural decision with the longest payback horizon across the entire stack, and it is frequently skipped in the rush to ship.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">03</div>
+        <h3>Document What Was Rejected, Not Just What Was Chosen</h3>
+        <p>The rejected options in a decision carry as much institutional value as the chosen one. An ADR entry stating "AutoGen was evaluated and set aside because of X" is worth considerably more than nothing when the same debate resurfaces with a team that was not part of the original conversation.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">04</div>
+        <h3>Break the System Before Users Do</h3>
+        <p>Before any AI system reaches production, someone on the team should spend dedicated time trying to mislead it, confuse it, and extract behaviour it should not exhibit. Not as a compliance checkbox. As a real adversarial exercise with findings taken seriously. The uncomfortable results from that session are the ones that matter most.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">05</div>
+        <h3>Own the Cost Story Before Finance Writes It</h3>
+        <p>Inference costs scale in non-linear ways that tend to surface at the worst possible moment. Having a cost-per-workflow metric and a model routing strategy before the quarterly review is not over-preparation. It is the difference between owning the narrative and being handed a problem to explain.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">06</div>
+        <h3>Build AI Literacy Across the Org, Not Just AI Tooling</h3>
+        <p>An organisation where only the AI team understands how AI systems behave is one restructuring away from a knowledge crisis. Internal workshops, honest guidance on what systems can and cannot do, and enough shared vocabulary that cross-functional conversations do not lose their substance in translation.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">07</div>
+        <h3>Make Compliance the Default Path</h3>
+        <p>If following the governance framework requires extra steps, a separate checklist, or a separate conversation, it will be skipped when deadline pressure arrives. Guardrails built into platform defaults mean the compliant path and the easy path are the same path. That is the only way governance actually holds at scale.</p>
+      </div>
+      <div class="bp-card">
+        <div class="bp-number">08</div>
+        <h3>Treat Past Decisions as Revisable</h3>
+        <p>The AI landscape moves fast enough that a sound decision from eight months ago may be the wrong decision now. A scheduled quarterly review of major architectural assumptions, with an explicit norm that changing course is acceptable, is not a sign of instability. It is what keeps the architecture honest over time.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="cta">
+      <h3>Define the Role Before Posting the Job.</h3>
+      <p>Most organisations hiring for this role know they need the title filled. What they actually need is someone with the mandate to hold the whole picture together while every other team is moving fast and breaking things. That requires clear authority, explicit ownership, and a leadership team willing to slow down a decision when the architecture demands it. That conversation should happen before the first interview, not after the first production incident.</p>
+    </div>
+
+    <div class="tags">
+      <span class="tag">#AIArchitect</span>
+      <span class="tag">#AIStrategy</span>
+      <span class="tag">#EnterpriseAI</span>
+      <span class="tag">#AIGovernance</span>
+      <span class="tag">#LLMOps</span>
+      <span class="tag">#AILeadership</span>
+      <span class="tag">#ResponsibleAI</span>
+      <span class="tag">#AICodeReview</span>
+      <span class="tag">#PlatformEngineering</span>
+      <span class="tag">#TechStrategy</span>
+      <span class="tag">#GenerativeAI</span>
+      <span class="tag">#SoftwareArchitecture</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleAcc(btn){
+  btn.closest('.acc-item').classList.toggle('open');
+}
+</script>
+</body>
+</html>
