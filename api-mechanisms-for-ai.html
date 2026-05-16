@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Mechanisms for AI: REST vs GraphQL vs gRPC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f2ef;
+      color: #1d2226;
+      line-height: 1.75;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    a {
+      color: #0d47a1;
+      text-decoration: none;
+      border-bottom: 1px solid #b3c7e8;
+      transition: color .15s;
+    }
+
+    a:hover {
+      color: #512da8;
+      border-color: #9c6fda;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #0a2a5e 0%, #0d47a1 45%, #1a6b3c 100%);
+      padding: 56px 48px 44px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .hero-tag {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      display: inline-block;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 16px 0 18px;
+      position: relative;
+      z-index: 1;
+      line-height: 1.2;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      opacity: 0.95;
+      max-width: 580px;
+      position: relative;
+      z-index: 1;
+      margin: 12px 0 24px;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 18px;
+      font-size: 13.5px;
+      opacity: 0.85;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Body Content */
+    .body {
+      padding: 48px 48px 56px;
+    }
+
+    p {
+      margin: 16px 0;
+      color: #2d3748;
+    }
+
+    p strong {
+      color: #0a2a5e;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0a2a5e;
+      margin: 48px 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #e3eaf6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .emoji {
+      font-size: 24px;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-left: 4px solid #0d47a1;
+      background: #eef2fb;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 14.5px;
+      color: #1a365d;
+    }
+
+    .callout-warn {
+      border-left-color: #c05000;
+      background: #fff8f0;
+    }
+
+    .callout-warn p {
+      color: #7a3000;
+    }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      background: #0d1117;
+      border-radius: 10px;
+      padding: 28px 24px;
+      margin: 20px 0 28px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .flow-box {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid;
+      margin: 4px 2px;
+      margin-bottom: 8px;
+    }
+
+    .flow-green { background: rgba(80, 220, 160, 0.15); border-color: #50dca0; color: #50dca0; }
+    .flow-yellow { background: rgba(255, 200, 50, 0.12); border-color: #f0c040; color: #f0c040; }
+    .flow-blue { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6; }
+    .flow-grey { background: rgba(156, 163, 175, 0.15); border-color: #9ca3af; color: #9ca3af; }
+
+    .flow-arrow {
+      color: #6b7280;
+      text-align: center;
+      margin: 8px 0;
+      font-size: 13px;
+    }
+
+    /* Cards Grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 28px;
+    }
+
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .card-blue::before { background: #0d47a1; }
+    .card-green::before { background: #1a6b3c; }
+    .card-orange::before { background: #c05000; }
+
+    .card h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0a2a5e;
+      margin-bottom: 8px;
+      padding-top: 8px;
+    }
+
+    .card p {
+      font-size: 13.5px;
+      color: #2d3748;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      margin: 20px 0 28px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: #0d47a1;
+      color: #fff;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f7f9fc;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #fff;
+    }
+
+    tbody tr:hover {
+      background: #eef2fb;
+    }
+
+    td {
+      padding: 11px 16px;
+      color: #2d3748;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13.5px;
+    }
+
+    td:first-child {
+      font-weight: 600;
+      color: #1a365d;
+      font-size: 14px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-rest { background: #fde8d8; color: #8b3a10; }
+    .badge-graphql { background: #d8f4ea; color: #145c36; }
+    .badge-grpc { background: #f0e8fd; color: #5d3a7a; }
+
+    /* Numbered Cards */
+    .bp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 28px;
+    }
+
+    .bp-card {
+      background: #f7f9fc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 18px;
+      position: relative;
+    }
+
+    .bp-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #e2e8f0;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .bp-card h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0a2a5e;
+      margin-bottom: 5px;
+    }
+
+    .bp-card p {
+      font-size: 13px;
+      color: #2d3748;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Accordion */
+    .acc-item {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0;
+    }
+
+    .acc-item:last-child {
+      border-bottom: none;
+    }
+
+    .acc-trigger {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #0a2a5e;
+      padding: 14px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: color .15s;
+    }
+
+    .acc-trigger:hover {
+      color: #0d47a1;
+    }
+
+    .acc-icon {
+      font-size: 18px;
+      color: #4a5568;
+      transition: transform .25s;
+    }
+
+    .acc-item.open .acc-icon {
+      transform: rotate(45deg);
+      color: #0d47a1;
+    }
+
+    .acc-body {
+      display: none;
+      font-size: 14px;
+      color: #2d3748;
+      line-height: 1.7;
+      padding-bottom: 14px;
+    }
+
+    .acc-item.open .acc-body {
+      display: block;
+    }
+
+    /* CTA Block */
+    .cta {
+      background: linear-gradient(135deg, #0a2a5e, #1a6b3c);
+      border-radius: 12px;
+      padding: 32px 30px;
+      color: #fff;
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    .cta h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .cta p {
+      font-size: 14.5px;
+      opacity: 0.9;
+      color: #fff;
+      margin: 0;
+    }
+
+    /* Tags Footer */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 32px;
+    }
+
+    .tag {
+      background: #e8eef8;
+      color: #0a2a5e;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 14px;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 36px 0;
+    }
+
+    /* Responsive */
+    @media(max-width: 600px) {
+      .hero, .body {
+        padding: 32px 24px;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+      }
+
+      .card-grid, .bp-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-tag">Architecture & Integration</div>
+      <h1>Wiring AI: REST, GraphQL, and gRPC 🔌</h1>
+      <p class="hero-sub">Three API paradigms power AI applications today. Each solves a different problem, carries different tradeoffs, and fits distinct deployment contexts. Understanding where each shines is the difference between elegant architecture and costly rewrites.</p>
+      <div class="hero-meta">
+        <span>April 2026</span>
+        <span>⏱ 8 min read</span>
+        <span>✍️ Utkarsh Swarnkar</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+      <!-- Hook -->
+      <p>Choosing an API mechanism for AI infrastructure is like selecting a shipping method for cargo. REST is the truck, ubiquitous and forgiving. GraphQL is the custom logistics network, precise but complex. gRPC is the high-speed rail, blazing fast but inflexible. Each moves goods. None is universally best.</p>
+
+      <p>The proliferation of AI applications, from real-time inference endpoints to batch processing pipelines, has made this choice increasingly consequential. A startup building a chatbot assistant faces different constraints than an enterprise orchestrating multi-tenant ML workflows across cloud regions. The transport layer matters more than ever.</p>
+
+      <p>This article examines three API paradigms through the lens of AI workloads: their architectural foundations, performance profiles, security models, and the specific contexts where each excels.</p>
+
+      <div class="callout">
+        <p><strong>💡 Core insight</strong> - The right API mechanism depends less on technological purity and more on your data shape, latency budget, ecosystem maturity, and team bandwidth for operational complexity.</p>
+      </div>
+
+      <!-- Section: How It Works -->
+      <div class="section-title"><span class="emoji">⚙️</span> The Three Paradigms at a Glance</div>
+
+      <div class="flow-diagram">
+        <strong style="color: #fff; font-size: 13px;">REST (Stateless Request-Response)</strong>
+        <div style="color: #9ca3af; font-size: 12px; margin: 8px 0;">HTTP verb + URL path + JSON body / response</div>
+        <div class="flow-box flow-green">client POST /api/models/inference</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box flow-yellow">server processes, returns 200 + result JSON</div>
+
+        <hr style="border: none; border-top: 1px solid #2d3748; margin: 20px 0;">
+
+        <strong style="color: #fff; font-size: 13px; margin-top: 12px; display: block;">GraphQL (Declarative Query Language)</strong>
+        <div style="color: #9ca3af; font-size: 12px; margin: 8px 0;">Client specifies exact fields needed</div>
+        <div class="flow-box flow-blue">client query { getInference { output, latency } }</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box flow-yellow">server resolves requested fields only</div>
+
+        <hr style="border: none; border-top: 1px solid #2d3748; margin: 20px 0;">
+
+        <strong style="color: #fff; font-size: 13px; margin-top: 12px; display: block;">gRPC (Binary Protocol Streaming)</strong>
+        <div style="color: #9ca3af; font-size: 12px; margin: 8px 0;">HTTP/2 + Protocol Buffers + streaming semantics</div>
+        <div class="flow-box flow-blue">client calls Predict(request_stream)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box flow-green">server streams responses in real-time</div>
+      </div>
+
+      <!-- Section: Benefits and Tradeoffs -->
+      <div class="section-title"><span class="emoji">⚡</span> Benefits and Shortcomings</div>
+
+      <div class="card-grid">
+        <div class="card card-blue">
+          <h3>REST: Simplicity at Scale</h3>
+          <p>Industry standard, browser-friendly, zero learning curve for HTTP. Stateless design aids horizontal scaling. Excellent ecosystem tooling: caching proxies, API gateways, load balancers all understand HTTP semantics.</p>
+        </div>
+
+        <div class="card card-blue">
+          <h3>REST: The Overhead Cost</h3>
+          <p>Verbose payloads inflate bandwidth. Over-fetching (receiving fields you don't need) is common. Under-fetching forces multiple round-trips. Polling for streaming data is inefficient. Not optimized for high-cardinality, low-latency workloads.</p>
+        </div>
+
+        <div class="card card-green">
+          <h3>GraphQL: Precision Query</h3>
+          <p>Client requests exact fields needed. Single endpoint eliminates under/over-fetching waste. Introspection enables powerful developer tooling. Excellent for mobile clients where bandwidth is precious.</p>
+        </div>
+
+        <div class="card card-green">
+          <h3>GraphQL: The Complexity Tax</h3>
+          <p>Query planning and resolution add server-side CPU. Caching becomes non-trivial (HTTP cache headers don't map cleanly). Rate limiting is harder (query complexity estimation required). Steep learning curve for operations teams unfamiliar with resolvers and query parsing.</p>
+        </div>
+
+        <div class="card card-orange">
+          <h3>gRPC: Performance Unleashed</h3>
+          <p>HTTP/2 multiplexing, binary encoding, native streaming. Latencies 5-10x lower than REST for same workload. Bidirectional streaming enables real-time inference pipelines. Language-agnostic code generation via Protocol Buffers.</p>
+        </div>
+
+        <div class="card card-orange">
+          <h3>gRPC: The Adoption Friction</h3>
+          <p>Requires .proto file definition and code generation workflow. Browser support is indirect (gRPC-Web). Debugging and monitoring demands specialized tools (grpcurl, Envoy). Firewall and infrastructure constraints around HTTP/2 and non-standard ports.</p>
+        </div>
+      </div>
+
+      <!-- Section: AI-Specific Use Cases -->
+      <div class="section-title"><span class="emoji">🤖</span> Where Each Excels in AI Workloads</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Use Case</th>
+              <th>Best Fit</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Chatbot / LLM inference (single turn)</td>
+              <td><span class="badge badge-rest">REST</span></td>
+              <td>Simple request-response, browser-friendly, cached prompts reduce latency.</td>
+            </tr>
+            <tr>
+              <td>Real-time token streaming (LLM)</td>
+              <td><span class="badge badge-grpc">gRPC</span></td>
+              <td>Bidirectional streaming, 100+ tokens/sec, client-driven backpressure.</td>
+            </tr>
+            <tr>
+              <td>Mobile AI app (image upload, inference)</td>
+              <td><span class="badge badge-graphql">GraphQL</span></td>
+              <td>Minimize payload size, request only metadata + embedding, not full model.</td>
+            </tr>
+            <tr>
+              <td>Batch inference pipeline (1000s requests)</td>
+              <td><span class="badge badge-grpc">gRPC</span></td>
+              <td>Streaming request batches, low per-request overhead, connection reuse.</td>
+            </tr>
+            <tr>
+              <td>Multi-tenant model serving with MCP</td>
+              <td><span class="badge badge-rest">REST</span></td>
+              <td>MCP tools are HTTP-compatible, middleware-friendly, tenant isolation via headers.</td>
+            </tr>
+            <tr>
+              <td>Complex feature composition (embeddings + ML)</td>
+              <td><span class="badge badge-graphql">GraphQL</span></td>
+              <td>Fetch embedding + transformed features in one query, avoid over-fetching unneeded signals.</td>
+            </tr>
+            <tr>
+              <td>Inference with fallback chains</td>
+              <td><span class="badge badge-rest">REST</span></td>
+              <td>Stateless + idempotent, transparent to proxies, easy retry logic.</td>
+            </tr>
+            <tr>
+              <td>Real-time collaborative AI (code copilot)</td>
+              <td><span class="badge badge-grpc">gRPC</span></td>
+              <td>Bidirectional streams, instant feedback, editor-integration friendliness.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section: Security -->
+      <div class="section-title"><span class="emoji">🔐</span> Security Mechanisms and Considerations</div>
+
+      <p>Security posture varies significantly across the three paradigms, though all three can be secured when implemented correctly.</p>
+
+      <div class="card-grid">
+        <div class="card card-blue">
+          <h3>REST: HTTP-Native Security</h3>
+          <p><strong>TLS/SSL:</strong> Industry standard, enforced at transport layer. <strong>Bearer tokens:</strong> JWT in Authorization header, stateless validation. <strong>CORS:</strong> Browser-level origin policy. <strong>Weakness:</strong> Session fixation if tokens stored in cookies; CSRF if state-changing operations use GET.</p>
+        </div>
+
+        <div class="card card-blue">
+          <h3>REST: At-Scale Hardening</h3>
+          <p>API Gateway (Kong, Tyk) adds rate limiting, request validation, request signing (HMAC-SHA256). WAF rules filter malicious payloads. Stateless design makes secrets rotation painless (no session store to invalidate).</p>
+        </div>
+
+        <div class="card card-green">
+          <h3>GraphQL: Query-Based Threat Surface</h3>
+          <p><strong>Authentication:</strong> Same as REST (Bearer tokens in header). <strong>Authorization:</strong> Per-field resolvers enforce granular access (user can query embedding but not model weights). <strong>Risk:</strong> Complex queries can trigger expensive database joins. Query cost estimation required to prevent DoS.</p>
+        </div>
+
+        <div class="card card-green">
+          <h3>GraphQL: Introspection & Leakage</h3>
+          <p>Introspection queries expose schema structure, field names, and types. Competitors can map your API surface. Mitigation: Disable introspection in production, or gate behind authentication. Query depth limits prevent recursive query bombs.</p>
+        </div>
+
+        <div class="card card-orange">
+          <h3>gRPC: Mutual TLS (mTLS) Ready</h3>
+          <p>Certificate-based client authentication, zero-knowledge proof of identity. TLS 1.3 default. Credential metadata in headers, not query strings. Excellent for service-to-service communication in Kubernetes clusters.</p>
+        </div>
+
+        <div class="card card-orange">
+          <h3>gRPC: Firewall and Discovery Challenges</h3>
+          <p>gRPC requires HTTP/2, which some enterprise firewalls block. Service discovery (Consul, etcd) needed for dynamic endpoint resolution. Client certificate rotation is manual unless orchestrated (e.g., cert-manager in K8s). gRPC-Web requires a proxy layer for browser clients.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <p><strong>⚠️ Secret management:</strong> All three paradigms are neutral on secrets. Use external vault (HashiCorp Vault, AWS Secrets Manager) for API keys, model weights, and credentials. Never embed secrets in code or config files exposed in version control.</p>
+      </div>
+
+      <!-- Section: MCP Integration -->
+      <div class="section-title"><span class="emoji">🔗</span> Integration with Model Context Protocol (MCP)</div>
+
+      <p>MCP is HTTP-based and REST-compatible by design. LLM-to-tool communication assumes request-response semantics. Here's how each mechanism integrates:</p>
+
+      <div class="card-grid">
+        <div class="card card-blue">
+          <h3>REST + MCP: Native Alignment</h3>
+          <p>MCP tools are HTTP endpoints. REST APIs map directly: tool parameter becomes query string or body field, response becomes tool result JSON. Minimal glue code. Ideal for LLMs orchestrating external APIs (weather, database, model inference).</p>
+        </div>
+
+        <div class="card card-orange">
+          <h3>gRPC + MCP: Adapter Layer Required</h3>
+          <p>LLM invokes REST wrapper around gRPC service. Wrapper translates REST to gRPC calls, handles streaming, returns JSON response. Extra hop adds latency but provides schema safety and binary efficiency for internal pipelines.</p>
+        </div>
+
+        <div class="card card-green">
+          <h3>GraphQL + MCP: Query Planning</h3>
+          <p>LLM generates GraphQL query based on schema introspection. Server resolves requested fields. Useful for complex feature composition (fetch user profile + recommendations in one query). Overhead of query parsing may not justify benefit for simple tool calls.</p>
+        </div>
+      </div>
+
+      <!-- Section: Ranking -->
+      <div class="section-title"><span class="emoji">🏆</span> Comparative Ranking</div>
+
+      <p>Ranking these paradigms is context-dependent, but we can score across key dimensions:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>REST</th>
+              <th>GraphQL</th>
+              <th>gRPC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Latency (p99)</td>
+              <td>~100ms</td>
+              <td>~120ms</td>
+              <td>~10-20ms</td>
+            </tr>
+            <tr>
+              <td>Learning Curve</td>
+              <td>Minimal</td>
+              <td>Moderate</td>
+              <td>Steep</td>
+            </tr>
+            <tr>
+              <td>Bandwidth Efficiency</td>
+              <td>Moderate</td>
+              <td>Excellent</td>
+              <td>Excellent</td>
+            </tr>
+            <tr>
+              <td>Debugging / Observability</td>
+              <td>Excellent</td>
+              <td>Good</td>
+              <td>Good (requires tooling)</td>
+            </tr>
+            <tr>
+              <td>Caching Story</td>
+              <td>Excellent (HTTP cache)</td>
+              <td>Complex</td>
+              <td>None (by design)</td>
+            </tr>
+            <tr>
+              <td>Browser Support</td>
+              <td>Native</td>
+              <td>Native</td>
+              <td>Requires proxy (gRPC-Web)</td>
+            </tr>
+            <tr>
+              <td>MCP Compatibility</td>
+              <td>Native</td>
+              <td>Works (adapters needed)</td>
+              <td>Requires wrapper</td>
+            </tr>
+            <tr>
+              <td>Streaming Support</td>
+              <td>Weak (polling)</td>
+              <td>Limited (subscriptions)</td>
+              <td>Native & efficient</td>
+            </tr>
+            <tr>
+              <td>Ecosystem Maturity</td>
+              <td>Mature</td>
+              <td>Mature</td>
+              <td>Growing</td>
+            </tr>
+            <tr>
+              <td>Enterprise Adoption</td>
+              <td>Dominant</td>
+              <td>Rising</td>
+              <td>Niche (cloud-native)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section: Best Practices -->
+      <div class="section-title"><span class="emoji">✅</span> Best Practices and Implementation Patterns</div>
+
+      <div class="bp-grid">
+        <div class="bp-card">
+          <div class="bp-number">01</div>
+          <h3>Start with REST, Graduate to gRPC</h3>
+          <p>Begin with REST for rapid iteration and team familiarity. Once bottlenecks emerge (high QPS, low-latency requirements), introduce gRPC for internal service-to-service communication. Hybrid deployments (REST public API, gRPC internal) are common and powerful.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">02</div>
+          <h3>Version Your APIs Explicitly</h3>
+          <p>REST: Use URL paths (/api/v1/, /api/v2/). GraphQL: Include version in schema type names or query root fields. gRPC: Maintain backward compatibility in .proto files (add new fields, never remove). Plan for API versioning from day one.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">03</div>
+          <h3>Instrument for Observability</h3>
+          <p>REST: Structured logging of request path, method, response code. GraphQL: Log query complexity score, resolver execution time. gRPC: Use OpenTelemetry interceptors. All three: Correlate logs with trace ID for end-to-end visibility.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">04</div>
+          <h3>Implement Rate Limiting Early</h3>
+          <p>REST: Token bucket at API Gateway. GraphQL: Query cost estimation (depth + field complexity). gRPC: Concurrency limits per client, connection pooling. Protect backend inference services from thundering herd scenarios.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">05</div>
+          <h3>Design Idempotent Operations</h3>
+          <p>REST: Use POST with idempotency keys in headers (X-Idempotency-Key). gRPC: Encode idempotency in proto message, let server cache request ID. Enables safe retries, critical for streaming inference pipelines.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">06</div>
+          <h3>Security Must Be Default</h3>
+          <p>All three: Enforce TLS/SSL everywhere. Use short-lived bearer tokens (JWT with 5-15 min expiry). Implement request signing (HMAC or mTLS) for high-value operations. Rotate secrets monthly, audit logs weekly.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">07</div>
+          <h3>Test Against Real Inference Patterns</h3>
+          <p>Load testing must match actual usage: REST batch requests, GraphQL with realistic query shapes, gRPC with concurrent streaming clients. Monitor tail latencies (p95, p99), not just averages.</p>
+        </div>
+
+        <div class="bp-card">
+          <div class="bp-number">08</div>
+          <h3>Document the Choice</h3>
+          <p>Record why you chose a specific mechanism. Revisit decision annually as team size and inference scale evolves. Migration cost is real; early clarity on constraints avoids costly pivots later.</p>
+        </div>
+      </div>
+
+      <!-- Accordion FAQ -->
+      <div class="section-title"><span class="emoji">❓</span> Frequently Asked Questions</div>
+
+      <div class="acc-item">
+        <div class="acc-trigger">
+          Can I use REST for real-time LLM token streaming?
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Technically yes, via HTTP chunked transfer encoding. The server sends response headers immediately, then streams JSON lines (one token per line). Clients read until connection closes. It works, but HTTP/1.1 cannot multiplex concurrent requests on the same connection. For 100+ concurrent clients streaming tokens, gRPC with HTTP/2 multiplexing is vastly superior. REST streaming works fine for low concurrency scenarios.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger">
+          Is GraphQL overkill for simple CRUD operations?
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Yes. GraphQL shines when clients need selective fields or when you have many related entities. If your API is five endpoints serving static payloads (e.g., model metadata, config), REST is simpler, faster to implement, and easier to cache. GraphQL adds operational complexity (resolver overhead, query validation, introspection attacks) that doesn't pay for itself on small APIs.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger">
+          How do I migrate from REST to gRPC without downtime?
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Gradual rollout: Serve both REST and gRPC from the same backend service. Use a client library that auto-selects gRPC if available, falls back to REST. Route a small percentage of traffic to gRPC (5%, then 10%) while monitoring latency and error rates. Once confident, flip the default. Decomission REST after six months of gRPC stability. This dual-protocol approach requires more operational overhead but eliminates cutover risk.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger">
+          What about WebSockets for real-time inference?
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <p>WebSockets are HTTP upgrade-based, designed for browser clients. They provide full-duplex communication over a single TCP connection. Good for collaborative AI (code copilot, live caption generation). However, they require session management (no automatic load balancing), complicate deployment on edge CDNs, and scale less efficiently than gRPC streaming. Use WebSockets for interactive browser-based AI, gRPC for backend-to-backend.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger">
+          Can I use a hybrid approach with multiple API mechanisms?
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Absolutely. Many mature systems run REST for external clients, gRPC for internal services, and WebSockets for live browser dashboards. The key is clear ownership: which clients use which protocol, and who owns the adaptation layer. Document the decision in your API strategy. Avoid creating a fragmented mess where every microservice picks its own protocol without coordination.</p>
+        </div>
+      </div>
+
+      <!-- Final insight -->
+      <div class="callout">
+        <p><strong>💡 Key takeaway</strong> - The best API mechanism is the one your team understands, your infrastructure supports, and your use case demands. Alignment on that choice beats religious adherence to a single paradigm.</p>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta">
+        <h3>Architect with Clarity</h3>
+        <p>Understanding the mechanics and tradeoffs of REST, GraphQL, and gRPC empowers you to build systems that scale. Choose intentionally, measure empirically, and iterate based on real-world workload patterns.</p>
+      </div>
+
+      <!-- Tags -->
+      <div class="tags">
+        <div class="tag">#API</div>
+        <div class="tag">#REST</div>
+        <div class="tag">#GraphQL</div>
+        <div class="tag">#gRPC</div>
+        <div class="tag">#AI</div>
+        <div class="tag">#SoftwareArchitecture</div>
+        <div class="tag">#SystemDesign</div>
+        <div class="tag">#APIMechanisms</div>
+        <div class="tag">#BackendEngineering</div>
+        <div class="tag">#CloudNative</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAcc(btn) {
+      btn.closest('.acc-item').classList.toggle('open');
+    }
+
+    document.querySelectorAll('.acc-trigger').forEach(trigger => {
+      trigger.addEventListener('click', function() {
+        toggleAcc(this);
+      });
+    });
+  </script>
+</body>
+</html>

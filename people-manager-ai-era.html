@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The End of the Traditional People Manager in the AI Era</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0d0d0d;
+    --ink-muted: #3a3a3a;
+    --ink-faint: #888;
+    --paper: #f7f4ef;
+    --accent: #c0392b;
+    --accent-warm: #e8532a;
+    --rule: #0d0d0d;
+    --rule-light: #d4cfc8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    padding: 0;
+  }
+
+  /* TOP RULE BANNER */
+  .masthead-rules {
+    width: 100%;
+    padding: 0 0 0;
+    background: var(--ink);
+    height: 6px;
+  }
+
+  /* HEADER */
+  header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(36px, 6vw, 72px) clamp(20px, 4vw, 48px) 40px;
+    border-bottom: 1.5px solid var(--rule);
+  }
+
+  .overline {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900;
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  h1 span.accent-word {
+    color: var(--accent);
+  }
+
+  .deck {
+    font-family: 'Source Serif 4', serif;
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    max-width: 620px;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 36px;
+  }
+
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    border-top: 0.5px solid var(--rule-light);
+    padding-top: 16px;
+  }
+
+  .byline-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .byline-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .byline-name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+    line-height: 1.2;
+  }
+
+  .byline-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .byline-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding-left: 24px;
+    border-left: 0.5px solid var(--rule-light);
+    line-height: 1.6;
+  }
+
+  /* MAIN LAYOUT */
+  .article-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px) 80px;
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 0 56px;
+  }
+
+  .main-column {
+    padding-top: 48px;
+    min-width: 0;
+  }
+
+  .sidebar {
+    padding-top: 48px;
+    border-left: 0.5px solid var(--rule-light);
+    padding-left: 40px;
+  }
+
+  /* LEAD PARAGRAPH */
+  .lead {
+    font-size: clamp(18px, 2.5vw, 21px);
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--ink);
+    margin-bottom: 32px;
+    text-align: left;
+    hyphens: none;
+  }
+
+  .lead::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 82px;
+    font-weight: 900;
+    float: left;
+    line-height: 0.8;
+    margin-right: 10px;
+    margin-top: 12px;
+    color: var(--accent);
+  }
+
+  /* SECTION HEADERS */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 56px 0 20px;
+    padding-top: 32px;
+    border-top: 1.5px solid var(--ink);
+  }
+
+  h2 .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+
+  /* BODY COPY */
+  p {
+    font-size: clamp(16px, 2vw, 18px);
+    line-height: 1.85;
+    color: var(--ink);
+    margin-bottom: 22px;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+    overflow-wrap: break-word;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* PULL QUOTE */
+  .pull-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 27px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    border-top: 3px solid var(--accent);
+    border-bottom: 0.5px solid var(--rule-light);
+    padding: 28px 0 24px;
+    margin: 44px 0;
+    font-style: italic;
+    text-align: left;
+    hyphens: none;
+  }
+
+  /* INLINE LIST STYLED AS COMPACT EVIDENCE */
+  .evidence-list {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    margin: 32px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .evidence-list .list-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .evidence-list ul {
+    list-style: none;
+    columns: 2;
+    column-gap: 24px;
+  }
+
+  .evidence-list ul li {
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 4px 0 4px 18px;
+    position: relative;
+    color: #e8e4dc;
+    break-inside: avoid;
+  }
+
+  .evidence-list ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  /* SHIFT BOX */
+  .shift-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 32px 0;
+    border: 1.5px solid var(--ink);
+  }
+
+  .shift-box .shift-col {
+    padding: 24px;
+  }
+
+  .shift-box .shift-col:first-child {
+    border-right: 1.5px solid var(--ink);
+    background: #ede8e0;
+  }
+
+  .shift-box .shift-col:last-child {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .shift-box .shift-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .shift-col:first-child .shift-label { color: var(--ink-faint); }
+  .shift-col:last-child .shift-label { color: var(--accent); }
+
+  .shift-box .shift-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .shift-col:last-child .shift-text { color: #f7f4ef; }
+
+  /* SIDEBAR ELEMENTS */
+  .sidebar-stat {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .sidebar-stat .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-stat .stat-desc {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+
+  .sidebar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .sidebar-note {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .sidebar-checklist {
+    list-style: none;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .sidebar-checklist .sc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .sidebar-checklist li {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-muted);
+    padding: 6px 0 6px 22px;
+    position: relative;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .sidebar-checklist li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+    top: 8px;
+  }
+
+  /* CLOSING MANIFESTO */
+  .closing {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 52px 48px;
+    margin: 56px 0 0;
+    grid-column: 1 / -1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .closing::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 260px;
+    font-weight: 900;
+    color: rgba(192, 57, 43, 0.12);
+    position: absolute;
+    top: -40px;
+    left: 20px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .closing p {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.5vw, 36px);
+    font-weight: 700;
+    line-height: 1.35;
+    color: #f7f4ef;
+    position: relative;
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+
+  .closing .closing-sub {
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: #b8b0a0;
+    position: relative;
+    max-width: 520px;
+  }
+
+  /* FINAL RULE */
+  footer {
+    background: var(--ink);
+    height: 4px;
+  }
+
+  /* ANNOTATIONS */
+  .annotation {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    display: block;
+    margin: -10px 0 24px;
+  }
+
+  /* HIGHLIGHT INLINE */
+  mark {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  @media (max-width: 680px) {
+    header { padding: 36px 20px 28px; }
+
+    .article-body {
+      grid-template-columns: 1fr;
+      padding: 0 20px 60px;
+    }
+    .main-column { padding-top: 32px; }
+    .sidebar {
+      border-left: none;
+      border-top: 1.5px solid var(--ink);
+      padding-left: 0;
+      padding-top: 32px;
+      margin-top: 40px;
+    }
+    .evidence-list ul { columns: 1; }
+    .shift-box { grid-template-columns: 1fr; }
+    .shift-box .shift-col:first-child { border-right: none; border-bottom: 1.5px solid var(--ink); }
+    .closing { padding: 36px 24px; }
+    .byline-meta { padding-left: 0; border-left: none; margin-top: 4px; }
+    p { font-size: 16px; line-height: 1.75; }
+    .lead { font-size: 18px; }
+    .lead::first-letter { font-size: 64px; }
+    h2 { font-size: 22px; }
+    .pull-quote { font-size: 22px; }
+    .shift-box .shift-text { font-size: 16px; }
+  }
+
+  @media (min-width: 681px) and (max-width: 900px) {
+    .article-body {
+      grid-template-columns: 1fr;
+      max-width: 640px;
+    }
+    .sidebar {
+      border-left: none;
+      border-top: 1.5px solid var(--rule-light);
+      padding-left: 0;
+      padding-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 40px;
+    }
+    .sidebar .sidebar-stat,
+    .sidebar .sidebar-note,
+    .sidebar .sidebar-checklist { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead-rules"></div>
+
+<header>
+  <span class="overline">Leadership &amp; The Future of Work</span>
+  <h1>The End of the<br /><span class="accent-word">Traditional</span><br />People Manager</h1>
+  <p class="deck">AI is not coming for your job. It is coming for the version of your job that was already running on fumes. The question is whether you know the difference.</p>
+  <div class="byline">
+    <div class="byline-author">
+      <div class="byline-avatar">YJ</div>
+      <div>
+        <span class="byline-name">Yogesh Jain</span>
+        <span class="byline-role">Leadership &amp; AI Transformation</span>
+      </div>
+    </div>
+    <div class="byline-meta">An Analysis &nbsp;|&nbsp; The AI Era &nbsp;|&nbsp; Management &amp; Leadership</div>
+  </div>
+</header>
+
+<div class="article-body">
+  <main class="main-column">
+
+    <p class="lead">For most of the last century, the manager's primary job was to move information. From the team to leadership. From leadership back down. Across functions. Into meeting rooms. Onto status decks. That was the work. And for a long time, that work had real value.</p>
+
+    <p>It does not anymore.</p>
+
+    <p>AI systems can now summarize your meetings, predict delivery risk, flag blocked dependencies, draft your stakeholder updates, and generate sprint analysis before your coffee gets cold. The infrastructure of traditional management is being rebuilt around you, whether or not you are part of the redesign.</p>
+
+    <h2>
+      <span class="num">01 &nbsp;/&nbsp; Context</span>
+      Management was built for coordination, not intelligence
+    </h2>
+
+    <p>The traditional manager role was not designed for the complexity we now face. It was designed to solve a specific information problem. Data moved slowly. People needed someone to gather it, translate it, and redistribute it. Managers were, at their core, <strong>human middleware</strong>.</p>
+
+    <div class="evidence-list">
+      <span class="list-label">What coordination management looked like</span>
+      <ul>
+        <li>Status tracking</li>
+        <li>Follow-ups</li>
+        <li>Reporting upward</li>
+        <li>Sprint monitoring</li>
+        <li>Escalation handling</li>
+        <li>Stakeholder updates</li>
+        <li>Performance reviews</li>
+        <li>Meeting orchestration</li>
+      </ul>
+    </div>
+
+    <p>None of that is wrong. All of it made sense. But the foundation it rested on, slow and manual information flow, is gone. AI has replaced the pipes. The question now is what you are for without the pipes.</p>
+
+    <h2>
+      <span class="num">02 &nbsp;/&nbsp; What AI Can Do Now</span>
+      The admin work is leaving the building
+    </h2>
+
+    <p>This is not a future forecast. These capabilities exist today, inside tools that many teams are already using. AI handles meeting summaries. It tracks project status. It identifies delivery risk. It maps dependencies. It drafts communications. It screens candidates. It surfaces productivity insights.</p>
+
+    <p>That list covers a large share of what many managers do on any given Tuesday.</p>
+
+    <p class="pull-quote">"The question is not whether AI can do this work. It can. The question is what you have left when it does."</p>
+
+    <p>The honest answer, for many managers, is not much. And that is not an indictment of those people. It is an indictment of how we have defined management success for decades.</p>
+
+    <h2>
+      <span class="num">03 &nbsp;/&nbsp; The Compression Layer</span>
+      People-only managers are the most vulnerable
+    </h2>
+
+    <p>There is a specific type of manager who is in genuine danger right now. They are not bad people. They are often well-liked. They run clean meetings. Their teams feel supported. But their value proposition, when stripped back to its core, is <strong>activity coordination and people supervision</strong>.</p>
+
+    <p>They do not own business outcomes. They do not build execution systems. They have not engaged with AI adoption. They manage the who and the when, but not the how and the why and the what-comes-next.</p>
+
+    <span class="annotation">The compression is already happening in middle management layers across tech, finance, and professional services.</span>
+
+    <p>Organizations looking at budget lines are asking a simple question: what does this layer of management produce? If the answer is status reports and approvals that AI can now handle, the math changes fast.</p>
+
+    <h2>
+      <span class="num">04 &nbsp;/&nbsp; The New Role</span>
+      Performance architect, not people supervisor
+    </h2>
+
+    <p>The managers who will matter in the next five years are not the ones with the biggest teams. They are the ones who build systems that make their teams faster, sharper, and more autonomous over time.</p>
+
+    <div class="shift-box">
+      <div class="shift-col">
+        <span class="shift-label">Old question</span>
+        <p class="shift-text">"Who is doing what, and when will it be done?"</p>
+      </div>
+      <div class="shift-col">
+        <span class="shift-label">New question</span>
+        <p class="shift-text">"How do I build a system where great outcomes happen without my constant involvement?"</p>
+      </div>
+    </div>
+
+    <p>The best managers in the AI era design high-performance delivery models. They build AI-assisted workflows from the ground up. They create decision-making frameworks that let their teams operate at speed. They think like architects, not administrators.</p>
+
+    <h2>
+      <span class="num">05 &nbsp;/&nbsp; The Literacy Gap</span>
+      AI understanding is now a leadership requirement
+    </h2>
+
+    <p>You do not need to build a model. You do not need to understand the math. But you do need to understand the tools well enough to make sound decisions about when to use them, when not to, and what the risks look like.</p>
+
+    <p>Managers who cannot reason about LLM capabilities, workflow automation, agentic systems, and AI governance are already operating with a blind spot. It is not a minor gap. It is like running a finance function without understanding a balance sheet.</p>
+
+    <p>The leaders who will be trusted with bigger decisions going forward are the ones who can sit in a room and say: <mark>here is what AI should own, here is what humans must own, and here is where we need validation before we ship.</mark></p>
+
+    <h2>
+      <span class="num">06 &nbsp;/&nbsp; Team Composition</span>
+      Your team is no longer only human
+    </h2>
+
+    <p>This is the part most managers have not fully absorbed yet. Teams now include people, AI copilots, autonomous agents, and workflow automation systems operating in parallel. The manager who only thinks about headcount is managing half the team.</p>
+
+    <p>Orchestrating human and AI resources together, knowing which tasks should go to whom and why, knowing where accountability sits, knowing where human judgment is non-negotiable, that is becoming a core leadership competency. It is not a bonus skill. It is the job.</p>
+
+    <h2>
+      <span class="num">07 &nbsp;/&nbsp; The New Scorecard</span>
+      Outcome ownership replaces activity ownership
+    </h2>
+
+    <p>The old success metric was "I manage a team of twenty." It looked good on paper. It carried status. It meant something on a resume.</p>
+
+    <p>The new metric is ruthlessly concrete. Did delivery speed improve? Did the system get more efficient? Did the team produce better decisions faster? What did you actually change about how the work gets done?</p>
+
+    <div class="evidence-list">
+      <span class="list-label">How managers will be evaluated going forward</span>
+      <ul>
+        <li>Business impact created</li>
+        <li>Execution velocity</li>
+        <li>Innovation speed</li>
+        <li>Operational leverage</li>
+        <li>Cost efficiency</li>
+        <li>Decision quality</li>
+        <li>AI adoption leadership</li>
+        <li>Team capability growth</li>
+      </ul>
+    </div>
+
+    <p>Team size will not protect you. In some cases, a smaller team producing better outcomes with AI leverage will be seen as more valuable than a larger team producing the same output the old way.</p>
+
+    <h2>
+      <span class="num">08 &nbsp;/&nbsp; Soft Skills</span>
+      They still matter. They are not enough.
+    </h2>
+
+    <p>Empathy matters. So does mentorship, psychological safety, and the ability to develop people over time. None of that goes away. Great leaders still build trust. They still create environments where people do their best work.</p>
+
+    <p>But soft skills without operational leverage are a liability in disguise. Caring deeply about your people while producing no measurable improvement in how work gets done is not leadership. It is a warm presence in an expensive seat.</p>
+
+    <p>The combination that works: <strong>human judgment and empathy on top of systems thinking, operational excellence, and AI adoption capability.</strong> Soft skills are the roof. Systems and strategy are the foundation. You cannot have a roof without a foundation.</p>
+
+    <h2>
+      <span class="num">09 &nbsp;/&nbsp; The Comfort Trap</span>
+      The biggest career risk is staying still
+    </h2>
+
+    <p>A lot of managers look at their calendars, full of meetings, full of check-ins and syncs and reviews, and they feel busy. Busyness has always been a proxy for value. The fuller the calendar, the more important the person. That logic made sense when coordination was scarce.</p>
+
+    <p>Now it is a warning sign.</p>
+
+    <p>If your primary contribution to the organization is attending meetings and generating status information, AI is already capable of replacing most of that function. The comfort of being needed in every room is the exact thing that is going to make you redundant.</p>
+
+    <p>The real threat is not that AI is coming. The real threat is that you become <mark>expensive coordination overhead</mark> in an organization that is learning to coordinate without you.</p>
+
+    <div class="closing">
+      <p>AI will not eliminate managers. It will eliminate managers who cannot create leverage.</p>
+      <p class="closing-sub">The future belongs to leaders who manage people, systems, intelligence, and outcomes together. Not just people. If your calendar is full of meetings but empty of measurable impact, AI is already questioning your role. The better question is whether you are.</p>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-stat">
+      <span class="sidebar-label">Reality check</span>
+      <span class="stat-num">~60%</span>
+      <span class="stat-desc">of typical mid-manager tasks involve status reporting, scheduling, and information routing that AI tools can now handle.</span>
+    </div>
+
+    <div class="sidebar-stat">
+      <span class="sidebar-label">The compression layer</span>
+      <span class="stat-num">3x</span>
+      <span class="stat-desc">the rate of middle management reduction in AI-mature organizations compared to the broader market.</span>
+    </div>
+
+    <p class="sidebar-note">The managers surviving this shift are not the most senior. They are the ones who built systems that produce outcomes without requiring their constant presence.</p>
+
+    <ul class="sidebar-checklist">
+      <span class="sc-label">AI literacy basics for managers</span>
+      <li>LLM capabilities and limits</li>
+      <li>Prompt thinking</li>
+      <li>Workflow automation</li>
+      <li>Agentic systems</li>
+      <li>AI governance basics</li>
+      <li>Risk and validation</li>
+      <li>Human judgment boundaries</li>
+    </ul>
+
+    <ul class="sidebar-checklist">
+      <span class="sc-label">What the future manager owns</span>
+      <li>Execution system design</li>
+      <li>AI-assisted workflows</li>
+      <li>Decision frameworks</li>
+      <li>Outcome measurement</li>
+      <li>Human + AI orchestration</li>
+      <li>Transformation leadership</li>
+    </ul>
+
+    <p class="sidebar-note">Soft skills and operational leverage are not opposites. The managers who combine both are the ones organizations will fight to keep.</p>
+
+  </aside>
+
+</div>
+
+<footer></footer>
+
+</body>
+</html>
